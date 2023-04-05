@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { WischesModule } from './wisches/wisches.module';
+import { WischlistsModule } from './wischlists/wischlists.module';
+import { OffersModule } from './offers/offers.module';
 
 @Module({
   imports: [
@@ -17,6 +21,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       // subscribers: [],
       // migrations: [],
     }),
+    UsersModule,
+    WischesModule,
+    WischlistsModule,
+    OffersModule,
   ],
   controllers: [AppController],
   providers: [],
