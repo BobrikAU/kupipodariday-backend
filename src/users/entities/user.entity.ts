@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Length, IsNotEmpty, IsUrl, IsEmail } from 'class-validator';
-import { Wisch } from '../../wisches/entities/wisch.entity';
+import { Wish } from '../../wisches/entities/wisch.entity';
 
 @Entity()
 export class User {
@@ -39,8 +39,8 @@ export class User {
   @IsNotEmpty()
   password: string;
 
-  @OneToMany(() => Wisch, (wisch) => wisch.owner)
-  wishes: Wisch[];
+  @OneToMany(() => Wish, (wish) => wish.owner)
+  wishes: Wish[];
 
   @Column()
   offers: number[];

@@ -8,9 +8,10 @@ import {
 } from 'typeorm';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
+import { Wischlist } from '../../wischlists/entities/wischlist.entity';
 
 @Entity()
-export class Wisch {
+export class Wish {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -45,6 +46,9 @@ export class Wisch {
 
   @Column()
   offers: number[];
+
+  @ManyToOne(() => Wischlist, (wischlist) => wischlist.items)
+  wischlist: Wischlist;
 
   @Column('integer')
   copied: number;
