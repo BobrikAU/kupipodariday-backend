@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
-import { Wischlist } from '../../wischlists/entities/wischlist.entity';
+import { Wishlist } from '../../wischlists/entities/wischlist.entity';
 
 @Entity()
 export class Wish {
@@ -47,8 +47,8 @@ export class Wish {
   @Column()
   offers: number[];
 
-  @ManyToOne(() => Wischlist, (wischlist) => wischlist.items)
-  wischlist: Wischlist;
+  @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
+  wischlist: Wishlist;
 
   @Column('integer')
   copied: number;

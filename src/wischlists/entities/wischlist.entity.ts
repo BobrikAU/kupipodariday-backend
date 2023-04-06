@@ -5,12 +5,14 @@ import {
   UpdateDateColumn,
   Column,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Length, IsNotEmpty, IsUrl } from 'class-validator';
 import { Wish } from '../../wisches/entities/wisch.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
-export class Wischlist {
+export class Wishlist {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,6 +32,9 @@ export class Wischlist {
 
   @OneToMany(() => Wish, (wish) => wish.wischlist)
   items: Wish[];
+
+  @ManyToOne(() => User, (user) => user.wishlists)
+  owner: User;
 
   @CreateDateColumn()
   createdAt: Date;

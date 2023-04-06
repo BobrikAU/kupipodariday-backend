@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Length, IsNotEmpty, IsUrl, IsEmail } from 'class-validator';
 import { Wish } from '../../wisches/entities/wisch.entity';
+import { Wishlist } from '../../wischlists/entities/wischlist.entity';
 
 @Entity()
 export class User {
@@ -45,8 +46,8 @@ export class User {
   @Column()
   offers: number[];
 
-  @Column()
-  wishlist: number[];
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
+  wishlists: Wishlist[];
 
   @CreateDateColumn()
   createdAt: Date;
