@@ -5,10 +5,12 @@ import {
   UpdateDateColumn,
   Column,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
 import { Wishlist } from '../../wischlists/entities/wischlist.entity';
+import { Offer } from '../../offers/entities/offer.entity';
 
 @Entity()
 export class Wish {
@@ -44,8 +46,8 @@ export class Wish {
   @Length(1, 1024)
   description: string;
 
-  @Column()
-  offers: number[];
+  @OneToMany(() => Offer, (offer) => offer.item)
+  offers: Offer[];
 
   @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
   wischlist: Wishlist;

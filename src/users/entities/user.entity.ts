@@ -9,6 +9,7 @@ import {
 import { Length, IsNotEmpty, IsUrl, IsEmail } from 'class-validator';
 import { Wish } from '../../wisches/entities/wisch.entity';
 import { Wishlist } from '../../wischlists/entities/wischlist.entity';
+import { Offer } from '../../offers/entities/offer.entity';
 
 @Entity()
 export class User {
@@ -43,8 +44,8 @@ export class User {
   @OneToMany(() => Wish, (wish) => wish.owner)
   wishes: Wish[];
 
-  @Column()
-  offers: number[];
+  @OneToMany(() => Offer, (offer) => offer.user)
+  offers: Offer[];
 
   @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
   wishlists: Wishlist[];
