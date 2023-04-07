@@ -5,6 +5,10 @@ import { UsersModule } from './users/users.module';
 import { WischesModule } from './wisches/wisches.module';
 import { WischlistsModule } from './wischlists/wischlists.module';
 import { OffersModule } from './offers/offers.module';
+import { Offer } from './offers/entities/offer.entity';
+import { User } from './users/entities/user.entity';
+import { Wish } from './wisches/entities/wisch.entity';
+import { Wishlist } from './wischlists/entities/wischlist.entity';
 
 @Module({
   imports: [
@@ -17,7 +21,7 @@ import { OffersModule } from './offers/offers.module';
       database: 'kupipodariday', //process.env.DATABASE_NAME || 'test',
       synchronize: false,
       // logging: true,
-      entities: [],
+      entities: [Offer, User, Wish, Wishlist],
       // subscribers: [],
       // migrations: [],
     }),
