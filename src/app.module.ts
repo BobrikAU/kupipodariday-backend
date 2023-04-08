@@ -23,7 +23,6 @@ import { Wishlist } from './wischlists/entities/wischlist.entity';
       // logging: true,
       entities: [Offer, User, Wish, Wishlist],
       // subscribers: [],
-      // migrations: [],
     }),
     UsersModule,
     WischesModule,
