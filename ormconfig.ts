@@ -5,6 +5,7 @@ import { Wish } from './src/wisches/entities/wisch.entity';
 import { Wishlist } from './src/wischlists/entities/wischlist.entity';
 import { initMigration1681048409651 } from './src/database/migrations/1681048409651-initMigration';
 import { changeWish11681048746753 } from './src/database/migrations/1681048746753-changeWish1';
+import { changeWish21681064987122 } from './src/database/migrations/1681064987122-changeWish2';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -17,5 +18,5 @@ export const AppDataSource = new DataSource({
   // logging: true,
   entities: [Offer, User, Wish, Wishlist],
   // subscribers: [],
-  migrations: [changeWish11681048746753],
+  migrations: [changeWish21681064987122],
 });

@@ -12,24 +12,24 @@ export class WischesService {
     private wishRepository: Repository<Wish>,
   ) {}
 
-  create(createWischDto: CreateWischDto) {
+  async create(createWischDto: CreateWischDto) {
     const data = { ...createWischDto };
-    return this.wishRepository.insert(data);
+    return await this.wishRepository.insert(data);
   }
 
-  findAll() {
-    return this.wishRepository.find();
+  async findAll() {
+    return await this.wishRepository.find();
   }
 
-  findOne(id: number) {
-    return this.wishRepository.findOneByOrFail({ id });
+  async findOne(id: number) {
+    return await this.wishRepository.findOneByOrFail({ id });
   }
 
-  update(id: number, updateWischDto: UpdateWischDto) {
-    return this.wishRepository.update(id, updateWischDto);
+  async update(id: number, updateWischDto: UpdateWischDto) {
+    return await this.wishRepository.update(id, updateWischDto);
   }
 
-  remove(id: number) {
-    return this.wishRepository.delete(id);
+  async remove(id: number) {
+    return await this.wishRepository.delete(id);
   }
 }

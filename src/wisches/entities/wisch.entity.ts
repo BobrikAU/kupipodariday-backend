@@ -32,11 +32,11 @@ export class Wish {
   @IsNotEmpty()
   image: string;
 
-  @Column('decimal', { scale: 2, nullable: false })
+  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: false })
   @IsNotEmpty()
   price: number;
 
-  @Column('decimal', { scale: 2, default: 0 })
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   raised: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
