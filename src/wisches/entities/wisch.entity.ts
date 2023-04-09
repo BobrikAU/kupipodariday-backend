@@ -32,11 +32,11 @@ export class Wish {
   @IsNotEmpty()
   image: string;
 
-  @Column('decimal', { precision: 2, nullable: false })
+  @Column('decimal', { scale: 2, nullable: false })
   @IsNotEmpty()
   price: number;
 
-  @Column('decimal', { precision: 2 })
+  @Column('decimal', { scale: 2, default: 0 })
   raised: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
@@ -52,7 +52,7 @@ export class Wish {
   @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
   wischlist: Wishlist;
 
-  @Column('integer')
+  @Column('integer', { default: 0 })
   copied: number;
 
   @CreateDateColumn()
