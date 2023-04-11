@@ -19,9 +19,9 @@ export class Offer {
   user: User;
 
   @ManyToOne(() => Wish, (wish) => wish.offers)
-  item: Wish[];
+  item: Wish;
 
-  @Column('decimal', { precision: 2, nullable: false })
+  @Column('numeric', { precision: 10, scale: 2, nullable: false })
   @IsNotEmpty()
   amount: number;
 

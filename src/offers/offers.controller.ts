@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
+import { FindOneOfferDto } from './dto/find-one-offer.dto';
+import { DeleteOfferDto } from './dto/delete-offer.dto';
 
 @Controller('offers')
 export class OffersController {
@@ -18,8 +28,8 @@ export class OffersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.offersService.findOne(+id);
+  findOne(@Param() params: FindOneOfferDto) {
+    return this.offersService.findOne(params.id);
   }
 
   @Patch(':id')
@@ -28,7 +38,7 @@ export class OffersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.offersService.remove(+id);
+  remove(@Param() params: DeleteOfferDto) {
+    return this.offersService.remove(params.id);
   }
 }
