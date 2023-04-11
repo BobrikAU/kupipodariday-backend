@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Wish } from './entities/wisch.entity';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
 
 @Injectable()
 export class WischesService {
-  create(createWischDto: CreateWischDto) {
-    return 'This action adds a new wisch';
+  constructor(
+    @InjectRepository(Wish)
+    private wishRepository: Repository<Wish>,
+  ) {}
+
+  async create(createWischDto: CreateWischDto) {
+    const data = { ...createWischDto };
+    return await this.wishRepository.insert(data);
   }
 
-  findAll() {
-    return `This action returns all wisches`;
+  async findAll() {
+    return await this.wishRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wisch`;
+  async findOne(id: number) {
+    return await this.wishRepository.findOneByOrFail({ id });
   }
 
-  update(id: number, updateWischDto: UpdateWischDto) {
-    return `This action updates a #${id} wisch`;
+  async update(id: number, updateWischDto: UpdateWischDto) {
+    return await this.wishRepository.update(id, updateWischDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wisch`;
+  async remove(id: number) {
+    return await this.wishRepository.delete(id);
   }
 }

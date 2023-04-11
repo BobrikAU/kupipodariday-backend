@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { WischesService } from './wisches.service';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
+import { GetWishDto } from './dto/get-wish.dto';
+import { DeleteWishDto } from './dto/delete-wish.dto';
 
-@Controller('wisches')
+@Controller('wishes')
 export class WischesController {
   constructor(private readonly wischesService: WischesService) {}
 
@@ -18,8 +28,9 @@ export class WischesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wischesService.findOne(+id);
+  findOne(@Param() params: GetWishDto) {
+    console.log(params.id);
+    return this.wischesService.findOne(params.id);
   }
 
   @Patch(':id')
@@ -28,7 +39,7 @@ export class WischesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wischesService.remove(+id);
+  remove(@Param() params: DeleteWishDto) {
+    return this.wischesService.remove(params.id);
   }
 }
