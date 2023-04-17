@@ -16,8 +16,8 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('varchar', { length: 30, unique: true, nullable: true })
-  @Length(2, 30)
+  @Column('varchar', { length: 64, unique: true, nullable: true })
+  @Length(3, 64)
   @IsNotEmpty()
   username: string;
 

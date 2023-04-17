@@ -5,10 +5,10 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { UserResponseDto } from '../dto/user-response.dto';
+import { SignupResponseDto } from '../dto/signup-response.dto';
 
 @Injectable()
-export class SignupUserResponseInterceptor implements NestInterceptor {
+export class SignupAuthResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map(
@@ -20,7 +20,7 @@ export class SignupUserResponseInterceptor implements NestInterceptor {
           email,
           createdAt,
           updatedAt,
-        }: UserResponseDto) => ({
+        }: SignupResponseDto) => ({
           id,
           username,
           about,
