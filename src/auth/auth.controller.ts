@@ -18,11 +18,13 @@ import {
   UserOrPasswordNotValid,
 } from '../filters/user-exists.filter';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Public } from './guards/jwt-auth.guard';
 
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('signup')
   @UseFilters(UserOrMailExistsExceptionFilter, InvalidUserData)
   @UseInterceptors(SignupAuthResponseInterceptor)
@@ -30,6 +32,7 @@ export class AuthController {
     return await this.authService.signup(createUserDto);
   }
 
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('signin')
   @UseFilters(UserOrPasswordNotValid)

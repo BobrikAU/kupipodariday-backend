@@ -5,6 +5,7 @@ import {
   HttpException,
   BadRequestException,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { QueryFailedError, EntityNotFoundError } from 'typeorm';
@@ -68,6 +69,17 @@ export class UserOrPasswordNotValid implements ExceptionFilter {
     }
     const response = host.switchToHttp().getResponse<Response>();
     const message = 'Некорректная пара логин и пароль';
+    response.status(status).json({ message });
+  }
+}
+
+@Catch(ForbiddenException)
+export class ForbiddenExceptionFilter implements ExceptionFilter {
+  catch(exception: ForbiddenException, host: ArgumentsHost) {
+    const status = exception.getStatus();
+    const message =
+      'Доступ к ресурсу ограничен по причине отсутствия авторизации. Пройдите авторизацию';
+    const response = host.switchToHttp().getResponse<Response>();
     response.status(status).json({ message });
   }
 }

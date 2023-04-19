@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindOneUser } from './dto/find-one-user.dto';
 import { FindManyDto } from './dto/find-many.dto';
+import { Request as RequestExpress } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -26,6 +29,19 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }  */
+
+  @Get('me')
+  async findMe(@Request() request: RequestExpress) {
+    let username: string;
+    for (const key in request.user) {
+      if (key === 'userName') {
+        username = request.user[key];
+      }
+    }
+    const { password, ...userWithoutPassword } =
+      await this.usersService.findOne(username);
+    return userWithoutPassword;
+  }
 
   @Get(':username')
   findOne(@Param('username') username: FindOneUser) {
