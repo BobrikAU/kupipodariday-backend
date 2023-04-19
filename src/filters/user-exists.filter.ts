@@ -4,9 +4,10 @@ import {
   ArgumentsHost,
   HttpException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { QueryFailedError } from 'typeorm';
+import { QueryFailedError, EntityNotFoundError } from 'typeorm';
 
 @Catch(QueryFailedError)
 export class UserOrMailExistsExceptionFilter implements ExceptionFilter {
@@ -43,6 +44,25 @@ export class InvalidUserData implements ExceptionFilter {
     } else {
       message = errResponse;
     }
+    response.status(status).json({ message });
+  }
+}
+
+@Catch(UnauthorizedException, EntityNotFoundError)
+export class UserOrPasswordNotValid implements ExceptionFilter {
+  catch(
+    exception: UnauthorizedException | EntityNotFoundError,
+    host: ArgumentsHost,
+  ) {
+    let status: number;
+    if (exception instanceof UnauthorizedException) {
+      status = exception.getStatus();
+    }
+    if (exception instanceof EntityNotFoundError) {
+      status = 401;
+    }
+    const response = host.switchToHttp().getResponse<Response>();
+    const message = 'Некорректная пара логин и пароль';
     response.status(status).json({ message });
   }
 }

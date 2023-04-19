@@ -22,14 +22,6 @@ export class UsersService {
 
   async findOne(username: string) {
     return await this.userRepository.findOneOrFail({
-      select: {
-        id: true,
-        username: true,
-        about: true,
-        avatar: true,
-        createdAt: true,
-        updatedAt: true,
-      },
       where: {
         username,
       },
