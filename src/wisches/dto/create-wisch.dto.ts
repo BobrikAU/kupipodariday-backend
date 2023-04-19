@@ -1,8 +1,14 @@
 import { IsNotEmpty, Length, IsUrl } from 'class-validator';
+import {
+  WISH_NAME_LENGTH_MIN,
+  WISH_NAME_LENGTH_MAX,
+  WISH_DESCRIPTION_LENGTH_MAX,
+  WISH_DESCRIPTION_LENGTH_MIN,
+} from '../../constants';
 
 export class CreateWischDto {
   @IsNotEmpty()
-  @Length(1, 250)
+  @Length(WISH_NAME_LENGTH_MIN, WISH_NAME_LENGTH_MAX)
   name: string;
 
   @IsNotEmpty()
@@ -17,6 +23,6 @@ export class CreateWischDto {
   price: number;
 
   @IsNotEmpty()
-  @Length(1, 1024)
+  @Length(WISH_DESCRIPTION_LENGTH_MIN, WISH_DESCRIPTION_LENGTH_MAX)
   description: string;
 }

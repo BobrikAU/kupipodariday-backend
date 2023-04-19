@@ -10,22 +10,32 @@ import { Length, IsNotEmpty, IsUrl, IsEmail } from 'class-validator';
 import { Wish } from '../../wisches/entities/wisch.entity';
 import { Wishlist } from '../../wischlists/entities/wischlist.entity';
 import { Offer } from '../../offers/entities/offer.entity';
+import {
+  USERNAME_LENGTH_MIN,
+  USERNAME_LENGTH_MAX,
+  ABOUT_LENGTH_MIN,
+  ABOUT_LENGTH_MAX,
+} from '../../constants';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('varchar', { length: 64, unique: true, nullable: true })
-  @Length(3, 64)
+  @Column('varchar', {
+    length: USERNAME_LENGTH_MAX,
+    unique: true,
+    nullable: true,
+  })
+  @Length(USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX)
   @IsNotEmpty()
   username: string;
 
   @Column('varchar', {
-    length: 200,
+    length: ABOUT_LENGTH_MAX,
     default: 'Пока ничего не рассказал о себе',
   })
-  @Length(2, 200)
+  @Length(ABOUT_LENGTH_MIN, ABOUT_LENGTH_MAX)
   about: string;
 
   @Column('varchar', { default: 'https://i.pravatar.cc/300' })

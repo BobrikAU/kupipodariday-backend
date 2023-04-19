@@ -1,11 +1,17 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateWischDto } from './create-wisch.dto';
 import { IsNotEmpty, Length, IsUrl, IsOptional } from 'class-validator';
+import {
+  WISH_NAME_LENGTH_MIN,
+  WISH_NAME_LENGTH_MAX,
+  WISH_DESCRIPTION_LENGTH_MAX,
+  WISH_DESCRIPTION_LENGTH_MIN,
+} from '../../constants';
 
 export class UpdateWischDto {
   @IsOptional()
   @IsNotEmpty()
-  @Length(1, 250)
+  @Length(WISH_NAME_LENGTH_MIN, WISH_NAME_LENGTH_MAX)
   name: string;
 
   @IsOptional()
@@ -24,7 +30,7 @@ export class UpdateWischDto {
 
   @IsOptional()
   @IsNotEmpty()
-  @Length(1, 1024)
+  @Length(WISH_DESCRIPTION_LENGTH_MIN, WISH_DESCRIPTION_LENGTH_MAX)
   description: string;
 }
 
