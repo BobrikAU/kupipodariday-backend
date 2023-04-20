@@ -27,9 +27,7 @@ export class UsersService {
 
   async findMe(userId: number) {
     return await this.userRepository.findOneOrFail({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
     });
   }
 
@@ -81,5 +79,31 @@ export class UsersService {
 
   remove(username: string) {
     return this.userRepository.delete({ username });
+  }
+
+  async findMyWishes(userId: number) {
+    return await this.userRepository.findOneOrFail({
+      select: {
+        wishes: true, // выбрано не все, что нужно по свагеру, но в коде не увидел, куда нужна вся эта информация
+      },
+      relations: {
+        wishes: true,
+      },
+      where: {
+        id: userId,
+      },
+    });
+  }
+
+  async findAnotherUserWishes(username: string) {
+    return await this.userRepository.findOneOrFail({
+      select: {
+        wishes: true, // выбрано не все, так как по коду нужна только информация о самом подарке
+      },
+      relations: {
+        wishes: true,
+      },
+      where: { username },
+    });
   }
 }

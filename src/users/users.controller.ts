@@ -45,16 +45,6 @@ export class UsersController {
     return userWithoutPassword;
   }
 
-  @Get(':username')
-  findOne(@Param('username') username: FindOneUser) {
-    return this.usersService.findOne(username.usermane);
-  }
-
-  @Post('find')
-  findMany(@Body() findManyDto: FindManyDto) {
-    return this.usersService.findMany(findManyDto.query);
-  }
-
   @UseFilters(InvalidUserData)
   @Patch('me')
   update(
@@ -63,6 +53,32 @@ export class UsersController {
   ) {
     const userId = this.userHelper.getUserIdOutRequest(request);
     return this.usersService.updateMe(userId, updateUserDto);
+  }
+
+  @Get('me/wishes')
+  async findMyWishes(@Request() request: RequestExpress) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    const { wishes } = await this.usersService.findMyWishes(userId);
+    return wishes;
+  }
+
+  @Get(':username/wishes')
+  async findAnotherUserWishes(@Param('username') username: string) {
+    const { wishes } = await this.usersService.findAnotherUserWishes(username);
+    return wishes;
+  }
+
+  @Get(':username')
+  async findOne(@Param('username') username: string) {
+    const { email, password, ...userData } = await this.usersService.findOne(
+      username,
+    );
+    return userData;
+  }
+
+  @Post('find')
+  findMany(@Body() findManyDto: FindManyDto) {
+    return this.usersService.findMany(findManyDto.query);
   }
 
   @Delete(':username')
