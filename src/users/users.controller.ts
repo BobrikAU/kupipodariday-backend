@@ -8,6 +8,7 @@ import {
   Delete,
   Request,
   UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,10 +16,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindOneUser } from './dto/find-one-user.dto';
 import { FindManyDto } from './dto/find-many.dto';
 import { Request as RequestExpress } from 'express';
+import { UserHelper } from './helpers/user.helper';
+import { InvalidUserData } from '../filters/user-exists.filter';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly userHelper: UserHelper,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -32,14 +38,10 @@ export class UsersController {
 
   @Get('me')
   async findMe(@Request() request: RequestExpress) {
-    let username: string;
-    for (const key in request.user) {
-      if (key === 'userName') {
-        username = request.user[key];
-      }
-    }
-    const { password, ...userWithoutPassword } =
-      await this.usersService.findOne(username);
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    const { password, ...userWithoutPassword } = await this.usersService.findMe(
+      userId,
+    );
     return userWithoutPassword;
   }
 
@@ -53,12 +55,14 @@ export class UsersController {
     return this.usersService.findMany(findManyDto.query);
   }
 
-  @Patch(':username')
+  @UseFilters(InvalidUserData)
+  @Patch('me')
   update(
-    @Param('username') username: string,
     @Body() updateUserDto: UpdateUserDto,
+    @Request() request: RequestExpress,
   ) {
-    return this.usersService.update(username, updateUserDto);
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    return this.usersService.updateMe(userId, updateUserDto);
   }
 
   @Delete(':username')

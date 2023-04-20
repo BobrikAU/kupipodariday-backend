@@ -4,7 +4,7 @@ import { ServerError } from '../../errors/errors';
 import { BCRYPT_GENSALT_ROUNDS } from '../../constants';
 
 @Injectable()
-export class AuthHash {
+export class UserHash {
   public async hashPassword(password: string) {
     const salt = await bcrypt.genSalt(BCRYPT_GENSALT_ROUNDS);
     const hash = await bcrypt.hash(password, salt);
