@@ -6,16 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
+  UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindOneUser } from './dto/find-one-user.dto';
 import { FindManyDto } from './dto/find-many.dto';
+import { Request as RequestExpress } from 'express';
+import { UserHelper } from './helpers/user.helper';
+import { InvalidUserData } from '../filters/user-exists.filter';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly userHelper: UserHelper,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -27,22 +36,49 @@ export class UsersController {
     return this.usersService.findAll();
   }  */
 
+  @Get('me')
+  async findMe(@Request() request: RequestExpress) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    const { password, ...userWithoutPassword } = await this.usersService.findMe(
+      userId,
+    );
+    return userWithoutPassword;
+  }
+
+  @UseFilters(InvalidUserData)
+  @Patch('me')
+  update(
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() request: RequestExpress,
+  ) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    return this.usersService.updateMe(userId, updateUserDto);
+  }
+
+  @Get('me/wishes')
+  async findMyWishes(@Request() request: RequestExpress) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    const { wishes } = await this.usersService.findMyWishes(userId);
+    return wishes;
+  }
+
+  @Get(':username/wishes')
+  async findAnotherUserWishes(@Param('username') username: string) {
+    const { wishes } = await this.usersService.findAnotherUserWishes(username);
+    return wishes;
+  }
+
   @Get(':username')
-  findOne(@Param('username') username: FindOneUser) {
-    return this.usersService.findOne(username.usermane);
+  async findOne(@Param('username') username: string) {
+    const { email, password, ...userData } = await this.usersService.findOne(
+      username,
+    );
+    return userData;
   }
 
   @Post('find')
   findMany(@Body() findManyDto: FindManyDto) {
     return this.usersService.findMany(findManyDto.query);
-  }
-
-  @Patch(':username')
-  update(
-    @Param('username') username: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.update(username, updateUserDto);
   }
 
   @Delete(':username')

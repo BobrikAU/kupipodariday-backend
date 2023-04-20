@@ -1,12 +1,18 @@
 import { IsNotEmpty, Length, IsUrl } from 'class-validator';
+import {
+  WISHLIST_NAME_LENGTH_MIN,
+  WISHLIST_NAME_LENGTH_MAX,
+  WISHLIST_DESCRIPTION_LENGTH_MIN,
+  WISHLIST_DESCRIPTION_LENGTH_MAX,
+} from '../../constants';
 
 export class CreateWischlistDto {
   @IsNotEmpty()
-  @Length(1, 250)
+  @Length(WISHLIST_NAME_LENGTH_MIN, WISHLIST_NAME_LENGTH_MAX)
   name: string;
 
   @IsNotEmpty()
-  @Length(1, 1500)
+  @Length(WISHLIST_DESCRIPTION_LENGTH_MIN, WISHLIST_DESCRIPTION_LENGTH_MAX)
   description: string;
 
   @IsNotEmpty()

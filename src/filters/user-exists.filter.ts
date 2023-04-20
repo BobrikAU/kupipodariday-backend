@@ -5,9 +5,15 @@ import {
   HttpException,
   BadRequestException,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { QueryFailedError, EntityNotFoundError } from 'typeorm';
+import {
+  HTTP_CODE_CONFLICT,
+  HTTP_CODE_SERVER_ERROR,
+  HTTP_CODE_UNAUTHORIZED,
+} from '../constants';
 
 @Catch(QueryFailedError)
 export class UserOrMailExistsExceptionFilter implements ExceptionFilter {
@@ -18,9 +24,9 @@ export class UserOrMailExistsExceptionFilter implements ExceptionFilter {
     let status: number;
     if (message.includes('повторяющееся значение ключа')) {
       message = 'Пользователь с таким email или username уже зарегистрирован';
-      status = 409;
+      status = HTTP_CODE_CONFLICT;
     } else {
-      status = 500;
+      status = HTTP_CODE_SERVER_ERROR;
       message = 'Ошибка сервера. Уже работаем над ее устранением';
     }
     response.status(status).json({ message });
@@ -59,10 +65,21 @@ export class UserOrPasswordNotValid implements ExceptionFilter {
       status = exception.getStatus();
     }
     if (exception instanceof EntityNotFoundError) {
-      status = 401;
+      status = HTTP_CODE_UNAUTHORIZED;
     }
     const response = host.switchToHttp().getResponse<Response>();
     const message = 'Некорректная пара логин и пароль';
+    response.status(status).json({ message });
+  }
+}
+
+@Catch(ForbiddenException)
+export class ForbiddenExceptionFilter implements ExceptionFilter {
+  catch(exception: ForbiddenException, host: ArgumentsHost) {
+    const status = exception.getStatus();
+    const message =
+      'Доступ к ресурсу ограничен по причине отсутствия авторизации. Пройдите авторизацию';
+    const response = host.switchToHttp().getResponse<Response>();
     response.status(status).json({ message });
   }
 }

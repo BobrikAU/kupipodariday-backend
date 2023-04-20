@@ -1,32 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { AuthHash } from './helpers/hash.helper';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { AuthUserDto } from './dto/authUser.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ServerError } from '../errors/errors';
+import { UserHash } from 'src/users/helpers/hash.helper';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly authHasch: AuthHash,
+    private readonly userHasch: UserHash,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
   async signup(createUserDto: CreateUserDto) {
-    const userData = {
-      ...createUserDto,
-      password: await this.authHasch.hashPassword(createUserDto.password),
-    };
-    return await this.usersService.create(userData);
+    return await this.usersService.create(createUserDto);
   }
 
   async validateUser(username: string, password: string) {
     const user = await this.usersService.findOne(username);
     if (user) {
       const { password: hashPassword, ...restUser } = user;
-      const isPasportValid = await this.authHasch.validatePassword(
+      const isPasportValid = await this.userHasch.validatePassword(
         password,
         hashPassword,
       );
