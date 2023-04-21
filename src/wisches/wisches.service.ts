@@ -5,6 +5,7 @@ import { Wish } from './entities/wisch.entity';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
 import { UsersService } from 'src/users/users.service';
+import { ForbiddenActionError } from '../errors/errors';
 
 @Injectable()
 export class WischesService {
@@ -43,6 +44,7 @@ export class WischesService {
     return await this.wishRepository.findOneOrFail({
       select: {
         owner: {
+          id: true,
           username: true,
         },
         offers: {
@@ -63,8 +65,24 @@ export class WischesService {
     });
   }
 
-  async update(id: number, updateWischDto: UpdateWischDto) {
-    return await this.wishRepository.update(id, updateWischDto);
+  async update(wishId: number, updateWischDto: UpdateWischDto, userId: number) {
+    const wish = await this.findOne({ id: wishId });
+    if (userId !== wish.owner.id) {
+      throw new ForbiddenActionError(
+        'Запрещено редактировать чужие пожелания.',
+      );
+    }
+    if (
+      updateWischDto.price &&
+      updateWischDto.price !== wish.price &&
+      wish.offers.length !== 0
+    ) {
+      throw new ForbiddenActionError(
+        'Невозможно изменить цену подарка, если другие согласились участвовать в его покупке.',
+      );
+    }
+    await this.wishRepository.update(wishId, updateWischDto);
+    return {};
   }
 
   async remove(id: number) {

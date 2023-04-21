@@ -13,7 +13,7 @@ import {
 import { WischesService } from './wisches.service';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
-import { GetWishDto } from './dto/get-wish.dto';
+import { IdWishDto } from './dto/id-wish.dto';
 import { DeleteWishDto } from './dto/delete-wish.dto';
 import { UserHelper } from '../users/helpers/user.helper';
 import { Request as RequestExpress } from 'express';
@@ -49,13 +49,18 @@ export class WischesController {
 
   @UseInterceptors(FindOneResponseInterceptor)
   @Get(':id')
-  findOne(@Param() params: GetWishDto) {
+  findOne(@Param() params: IdWishDto) {
     return this.wischesService.findOne({ id: params.id });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWischDto: UpdateWischDto) {
-    return this.wischesService.update(+id, updateWischDto);
+  update(
+    @Param() params: IdWishDto,
+    @Body() updateWischDto: UpdateWischDto,
+    @Request() request: RequestExpress,
+  ) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    return this.wischesService.update(params.id, updateWischDto, userId);
   }
 
   @Delete(':id')

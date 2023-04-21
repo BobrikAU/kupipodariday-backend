@@ -10,6 +10,7 @@ export class FindOneDto {
   createdAt: string;
   updatedAt: string;
   owner: {
+    id: number;
     username: string;
   };
   offers: {
