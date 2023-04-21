@@ -35,9 +35,14 @@ export class WischesController {
     return this.wischesService.create(createWischDto, ownerId);
   }
 
-  @Get()
-  findAll() {
-    return this.wischesService.findAll();
+  @Get('last')
+  findAllLast() {
+    return this.wischesService.findAllLast();
+  }
+
+  @Get('top')
+  findAllTop() {
+    return this.wischesService.findAllTop();
   }
 
   @Get(':id')

@@ -21,8 +21,22 @@ export class WischesService {
     return {};
   }
 
-  async findAll() {
-    return await this.wishRepository.find();
+  async findAllLast() {
+    return await this.wishRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 40,
+    });
+  }
+
+  async findAllTop() {
+    return await this.wishRepository.find({
+      order: {
+        copied: 'DESC',
+      },
+      take: 20,
+    });
   }
 
   async findOne(id: number) {
