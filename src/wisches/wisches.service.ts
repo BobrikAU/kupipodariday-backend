@@ -39,8 +39,28 @@ export class WischesService {
     });
   }
 
-  async findOne(id: number) {
-    return await this.wishRepository.findOneByOrFail({ id });
+  async findOne(query: { id: number }) {
+    return await this.wishRepository.findOneOrFail({
+      select: {
+        owner: {
+          username: true,
+        },
+        offers: {
+          createdAt: true,
+          amount: true,
+          user: {
+            username: true,
+          },
+        },
+      },
+      relations: {
+        owner: true,
+        offers: {
+          user: true,
+        },
+      },
+      where: query,
+    });
   }
 
   async update(id: number, updateWischDto: UpdateWischDto) {

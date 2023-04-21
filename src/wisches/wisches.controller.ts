@@ -8,6 +8,7 @@ import {
   Delete,
   Request,
   UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { WischesService } from './wisches.service';
 import { CreateWischDto } from './dto/create-wisch.dto';
@@ -17,6 +18,7 @@ import { DeleteWishDto } from './dto/delete-wish.dto';
 import { UserHelper } from '../users/helpers/user.helper';
 import { Request as RequestExpress } from 'express';
 import { InvalidData } from '../filters/user-exists.filter';
+import { FindOneResponseInterceptor } from './interceptors/find-one-response.interceptors';
 
 @Controller('wishes')
 export class WischesController {
@@ -45,10 +47,10 @@ export class WischesController {
     return this.wischesService.findAllTop();
   }
 
+  @UseInterceptors(FindOneResponseInterceptor)
   @Get(':id')
   findOne(@Param() params: GetWishDto) {
-    console.log(params.id);
-    return this.wischesService.findOne(params.id);
+    return this.wischesService.findOne({ id: params.id });
   }
 
   @Patch(':id')

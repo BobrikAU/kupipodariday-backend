@@ -15,7 +15,7 @@ export class OffersService {
   ) {}
 
   async create(createOfferDto: CreateOfferDto) {
-    const item = await this.wischesService.findOne(createOfferDto.item);
+    const item = await this.wischesService.findOne({ id: createOfferDto.item });
     const offer = {
       ...createOfferDto,
       item,
