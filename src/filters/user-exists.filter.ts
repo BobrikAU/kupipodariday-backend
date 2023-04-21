@@ -34,7 +34,7 @@ export class UserOrMailExistsExceptionFilter implements ExceptionFilter {
 }
 
 @Catch(BadRequestException)
-export class InvalidUserData implements ExceptionFilter {
+export class InvalidData implements ExceptionFilter {
   catch(exception: BadRequestException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

@@ -17,7 +17,7 @@ import { FindOneUser } from './dto/find-one-user.dto';
 import { FindManyDto } from './dto/find-many.dto';
 import { Request as RequestExpress } from 'express';
 import { UserHelper } from './helpers/user.helper';
-import { InvalidUserData } from '../filters/user-exists.filter';
+import { InvalidData } from '../filters/user-exists.filter';
 
 @Controller('users')
 export class UsersController {
@@ -45,7 +45,7 @@ export class UsersController {
     return userWithoutPassword;
   }
 
-  @UseFilters(InvalidUserData)
+  @UseFilters(InvalidData)
   @Patch('me')
   update(
     @Body() updateUserDto: UpdateUserDto,
