@@ -78,4 +78,7 @@ export class Wish {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column('integer', { nullable: true })
+  copied_from: number;
 }

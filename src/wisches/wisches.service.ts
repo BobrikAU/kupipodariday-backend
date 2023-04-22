@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull, DataSource } from 'typeorm';
 import { Wish } from './entities/wisch.entity';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
@@ -17,6 +17,7 @@ export class WischesService {
     @InjectRepository(Wish)
     private wishRepository: Repository<Wish>,
     private usersService: UsersService,
+    private dataSource: DataSource,
   ) {}
 
   async create(createWischDto: CreateWischDto, ownerId: number) {
@@ -28,18 +29,16 @@ export class WischesService {
 
   async findAllLast() {
     return await this.wishRepository.find({
-      order: {
-        createdAt: 'DESC',
-      },
+      where: { copied_from: IsNull() },
+      order: { createdAt: 'DESC' },
       take: LENGTH_LIST_LAST_GIFTS,
     });
   }
 
   async findAllTop() {
     return await this.wishRepository.find({
-      order: {
-        copied: 'DESC',
-      },
+      where: { copied_from: IsNull() },
+      order: { copied: 'DESC' },
       take: LENGTH_LIST_POPULAR_GIFTS,
     });
   }
@@ -102,11 +101,92 @@ export class WischesService {
   }
 
   async remove(wishId: number, userId: number) {
-    const wish = await this.wishRepository.findOneByOrFail({
+    // проверяем, есть ли подарок с указанным id и создан ли он пользователем, который инициировал
+    // его удаление
+    const deletedWish = await this.wishRepository.findOneByOrFail({
       id: wishId,
       owner: { id: userId },
     });
+    // проверяем, дедались ли с данного подарка копии; если да, то самая ранняя его копия займет
+    // место оригинала и получит данные о количестве созданных копий, что позволит в выдаче сохранить
+    // реальную статистику популярности; если нет, просто удаляем
+    if (deletedWish.copied > 0) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // находим все копии удаляемого подарка, сортируя по дате копирования
+        const copiedWishes = await queryRunner.manager.find(Wish, {
+          where: {
+            copied_from: wishId,
+          },
+          order: {
+            createdAt: 'ASC',
+          },
+        });
+        if (copiedWishes.length > 0) {
+          const firstCopiedWishes = copiedWishes.shift();
+          await Promise.all([
+            // самая ранняя копия станет оригиналом
+            queryRunner.manager.update(Wish, firstCopiedWishes.id, {
+              copied_from: null,
+              copied: deletedWish.copied,
+            }),
+            copiedWishes.map((wish) => {
+              queryRunner.manager.update(Wish, wish.id, {
+                copied_from: firstCopiedWishes.id,
+              });
+            }),
+          ]);
+        }
+        await queryRunner.commitTransaction();
+      } catch {
+        await queryRunner.rollbackTransaction();
+      } finally {
+        await queryRunner.release();
+      }
+    }
+    // удаление подарка
     await this.wishRepository.delete(wishId);
-    return wish;
+    return deletedWish;
+  }
+
+  async copy(wishId: { id: number }, userId: number) {
+    // находим id ползователя, который копирует карточку подарка
+    const owner = await this.usersService.findMe(userId);
+    // находим подарок, на карточке которого пользователь начал процесс копирования
+    const copiedWish = await this.wishRepository.findOneByOrFail(wishId);
+    // создаем переменную, где будет id подарка, который является оригинальным
+    let originalWishId: number;
+    if (!copiedWish.copied_from) {
+      // если подарок, на карточке которого начато копирование, сам не является копией, то
+      // он принимается за оригинальный и у него увеличивается число копий
+      originalWishId = copiedWish.id;
+      await this.wishRepository.update(copiedWish.id, {
+        copied: copiedWish.copied + 1,
+      });
+    } else {
+      // есди подарок, на карточке которого начато копирование, является копией, то находим
+      // оригинал и увеличиваем у него число копий
+      originalWishId = copiedWish.copied_from;
+      const originalWish = await this.wishRepository.findOneByOrFail({
+        id: originalWishId,
+      });
+      await this.wishRepository.update(originalWish.id, {
+        copied: originalWish.copied + 1,
+      });
+    }
+    // создаем копию подарка
+    const copiedWishData = {
+      name: copiedWish.name,
+      link: copiedWish.link,
+      image: copiedWish.image,
+      price: copiedWish.price,
+      description: copiedWish.description,
+      copied_from: originalWishId,
+      owner,
+    };
+    await this.wishRepository.save(copiedWishData);
+    return {};
   }
 }

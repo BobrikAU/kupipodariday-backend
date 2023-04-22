@@ -15,6 +15,7 @@ import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
 import { IdWishDto } from './dto/id-wish.dto';
 import { DeleteWishDto } from './dto/delete-wish.dto';
+import { CopyWishDto } from './dto/copy-wish.dto';
 import { UserHelper } from '../users/helpers/user.helper';
 import { Request as RequestExpress } from 'express';
 import { InvalidData } from '../filters/user-exists.filter';
@@ -73,5 +74,11 @@ export class WischesController {
   remove(@Param() params: DeleteWishDto, @Request() request: RequestExpress) {
     const userId = this.userHelper.getUserIdOutRequest(request);
     return this.wischesService.remove(params.id, userId);
+  }
+
+  @Post(':id/copy')
+  async copy(@Param() param: CopyWishDto, @Request() request: RequestExpress) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    return await this.wischesService.copy({ id: param.id }, userId);
   }
 }
