@@ -10,6 +10,6 @@ import { UserHash } from './helpers/hash.helper';
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService, UserHelper, UserHash],
-  exports: [UsersService, UserHash],
+  exports: [UsersService, UserHash, UserHelper],
 })
 export class UsersModule {}

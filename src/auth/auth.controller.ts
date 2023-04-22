@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
 import { SignupAuthResponseInterceptor } from './interceptors/signup-auth-response.interceptor';
 import {
   UserOrMailExistsExceptionFilter,
-  InvalidUserData,
+  InvalidData,
   UserOrPasswordNotValid,
 } from '../filters/user-exists.filter';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -26,7 +26,7 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  @UseFilters(UserOrMailExistsExceptionFilter, InvalidUserData)
+  @UseFilters(UserOrMailExistsExceptionFilter, InvalidData)
   @UseInterceptors(SignupAuthResponseInterceptor)
   async signup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.signup(createUserDto);
