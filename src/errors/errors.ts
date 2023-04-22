@@ -1,4 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
+import { HTTP_CODE_FORBIDDEN } from '../constants';
 
 export class ServerError extends Error {
   constructor(messege: string) {
@@ -7,8 +7,11 @@ export class ServerError extends Error {
   }
 }
 
-export class ForbiddenActionError extends ForbiddenException {
+export class ForbiddenActionError extends Error {
+  statusCode: number;
   constructor(message: string) {
     super(message);
+    this.name = 'Forbidden Action';
+    this.statusCode = HTTP_CODE_FORBIDDEN;
   }
 }

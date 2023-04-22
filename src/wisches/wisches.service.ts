@@ -6,6 +6,10 @@ import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
 import { UsersService } from 'src/users/users.service';
 import { ForbiddenActionError } from '../errors/errors';
+import {
+  LENGTH_LIST_LAST_GIFTS,
+  LENGTH_LIST_POPULAR_GIFTS,
+} from '../constants';
 
 @Injectable()
 export class WischesService {
@@ -27,7 +31,7 @@ export class WischesService {
       order: {
         createdAt: 'DESC',
       },
-      take: 40,
+      take: LENGTH_LIST_LAST_GIFTS,
     });
   }
 
@@ -36,7 +40,7 @@ export class WischesService {
       order: {
         copied: 'DESC',
       },
-      take: 20,
+      take: LENGTH_LIST_POPULAR_GIFTS,
     });
   }
 
@@ -66,26 +70,43 @@ export class WischesService {
   }
 
   async update(wishId: number, updateWischDto: UpdateWischDto, userId: number) {
-    const wish = await this.findOne({ id: wishId });
-    if (userId !== wish.owner.id) {
-      throw new ForbiddenActionError(
-        'Запрещено редактировать чужие пожелания.',
+    if (updateWischDto.price) {
+      const result = await this.wishRepository.update(
+        {
+          id: wishId,
+          owner: { id: userId },
+          price: updateWischDto.price,
+        },
+        updateWischDto,
       );
-    }
-    if (
-      updateWischDto.price &&
-      updateWischDto.price !== wish.price &&
-      wish.offers.length !== 0
-    ) {
-      throw new ForbiddenActionError(
-        'Невозможно изменить цену подарка, если другие согласились участвовать в его покупке.',
+      if (result.affected === 0) {
+        throw new ForbiddenActionError(
+          'Вы хотите изменить цену подарка после согласия других участвовать в его оплате или изменить чужое пожелание. Это невозможно.',
+        );
+      }
+    } else {
+      const result = await this.wishRepository.update(
+        {
+          id: wishId,
+          owner: { id: userId },
+        },
+        updateWischDto,
       );
+      if (result.affected === 0) {
+        throw new ForbiddenActionError(
+          'Вы хотите изменить чужое пожелание. Это невозможно.',
+        );
+      }
     }
-    await this.wishRepository.update(wishId, updateWischDto);
     return {};
   }
 
-  async remove(id: number) {
-    return await this.wishRepository.delete(id);
+  async remove(wishId: number, userId: number) {
+    const wish = await this.wishRepository.findOneByOrFail({
+      id: wishId,
+      owner: { id: userId },
+    });
+    await this.wishRepository.delete(wishId);
+    return wish;
   }
 }

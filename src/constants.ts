@@ -25,5 +25,9 @@ export const JWT_EXPIRESIN = '1D';
 export const JWT_SECRET = 'super_wichtig_geheimnis';
 
 export const HTTP_CODE_UNAUTHORIZED = 401;
+export const HTTP_CODE_FORBIDDEN = 403;
 export const HTTP_CODE_CONFLICT = 409;
 export const HTTP_CODE_SERVER_ERROR = 500;
+
+export const LENGTH_LIST_LAST_GIFTS = 40;
+export const LENGTH_LIST_POPULAR_GIFTS = 20;

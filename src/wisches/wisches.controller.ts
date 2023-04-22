@@ -18,6 +18,10 @@ import { DeleteWishDto } from './dto/delete-wish.dto';
 import { UserHelper } from '../users/helpers/user.helper';
 import { Request as RequestExpress } from 'express';
 import { InvalidData } from '../filters/user-exists.filter';
+import {
+  UpdateWishErrorFilter,
+  EntityNotFoundErrorFilter,
+} from '../filters/wish-exicts.filter';
 import { FindOneResponseInterceptor } from './interceptors/find-one-response.interceptors';
 
 @Controller('wishes')
@@ -53,6 +57,7 @@ export class WischesController {
     return this.wischesService.findOne({ id: params.id });
   }
 
+  @UseFilters(UpdateWishErrorFilter)
   @Patch(':id')
   update(
     @Param() params: IdWishDto,
@@ -63,8 +68,10 @@ export class WischesController {
     return this.wischesService.update(params.id, updateWischDto, userId);
   }
 
+  @UseFilters(EntityNotFoundErrorFilter)
   @Delete(':id')
-  remove(@Param() params: DeleteWishDto) {
-    return this.wischesService.remove(params.id);
+  remove(@Param() params: DeleteWishDto, @Request() request: RequestExpress) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    return this.wischesService.remove(params.id, userId);
   }
 }
