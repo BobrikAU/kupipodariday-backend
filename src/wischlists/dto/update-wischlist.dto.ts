@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateWischlistDto } from './create-wischlist.dto';
-import { IsOptional, Length, IsUrl } from 'class-validator';
+import { IsOptional, Length, IsUrl, IsArray } from 'class-validator';
 import {
   WISHLIST_NAME_LENGTH_MIN,
   WISHLIST_NAME_LENGTH_MAX,
@@ -10,16 +10,26 @@ import {
 
 export class UpdateWischlistDto {
   @IsOptional()
-  @Length(WISHLIST_NAME_LENGTH_MIN, WISHLIST_NAME_LENGTH_MAX)
+  @Length(WISHLIST_NAME_LENGTH_MIN, WISHLIST_NAME_LENGTH_MAX, {
+    message: 'Название коллекции может содержать не более 250 символов.',
+  })
   name: string;
 
   @IsOptional()
-  @Length(WISHLIST_DESCRIPTION_LENGTH_MIN, WISHLIST_DESCRIPTION_LENGTH_MAX)
+  @Length(WISHLIST_DESCRIPTION_LENGTH_MIN, WISHLIST_DESCRIPTION_LENGTH_MAX, {
+    message: 'Описание коллекции может содержать до 1500 символов',
+  })
   description: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({
+    message: 'Укажите валидный URL-адрес изображения',
+  })
   image: string;
+
+  @IsOptional()
+  @IsArray()
+  itemsId: number[];
 }
 
 // export class UpdateWischlistDto extends PartialType(CreateWischlistDto) {}

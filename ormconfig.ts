@@ -10,6 +10,8 @@ import { changeOffer11681233144859 } from './src/database/migrations/16812331448
 import { changeUser11681658048773 } from './src/database/migrations/1681658048773-changeUser1';
 import { changeWish31682161462011 } from './src/database/migrations/1682161462011-changeWish3';
 import { changeWishlists11682238765586 } from './src/database/migrations/1682238765586-changeWishlists1';
+import { changeWishlists21682267419503 } from './src/database/migrations/1682267419503-changeWishlists2';
+import { changeWishlists21682268049343 } from './src/database/migrations/1682268049343-changeWishlists2';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -22,5 +24,5 @@ export const AppDataSource = new DataSource({
   // logging: true,
   entities: [Offer, User, Wish, Wishlist],
   // subscribers: [],
-  migrations: [changeWishlists11682238765586],
+  migrations: [changeWishlists21682268049343],
 });

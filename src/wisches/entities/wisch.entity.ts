@@ -67,8 +67,8 @@ export class Wish {
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
 
-  @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
-  wischlist: Wishlist;
+  // @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
+  // wischlist: Wishlist;
 
   @Column('integer', { default: 0 })
   copied: number;
