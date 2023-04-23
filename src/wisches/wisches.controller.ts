@@ -66,7 +66,11 @@ export class WischesController {
     @Request() request: RequestExpress,
   ) {
     const userId = this.userHelper.getUserIdOutRequest(request);
-    return this.wischesService.update(params.id, updateWischDto, userId);
+    return this.wischesService.updatingByOwner(
+      params.id,
+      updateWischDto,
+      userId,
+    );
   }
 
   @UseFilters(EntityNotFoundErrorFilter)

@@ -1,11 +1,13 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsBoolean, IsNumber } from 'class-validator';
 
 export class CreateOfferDto {
   @IsNotEmpty()
   @IsNumber()
-  item: number;
+  itemId: number;
 
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Необходимо указать, сколько Вы готовы внести для оплаты подарка',
+  })
   @IsNumber()
   amount: number;
 

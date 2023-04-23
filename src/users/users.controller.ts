@@ -39,9 +39,10 @@ export class UsersController {
   @Get('me')
   async findMe(@Request() request: RequestExpress) {
     const userId = this.userHelper.getUserIdOutRequest(request);
-    const { password, ...userWithoutPassword } = await this.usersService.findMe(
-      userId,
-    );
+    const { password, ...userWithoutPassword } =
+      await this.usersService.findOne({
+        id: userId,
+      });
     return userWithoutPassword;
   }
 
@@ -70,9 +71,9 @@ export class UsersController {
 
   @Get(':username')
   async findOne(@Param('username') username: string) {
-    const { email, password, ...userData } = await this.usersService.findOne(
+    const { email, password, ...userData } = await this.usersService.findOne({
       username,
-    );
+    });
     return userData;
   }
 

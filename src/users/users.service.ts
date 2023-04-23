@@ -25,7 +25,11 @@ export class UsersService {
     return `This action returns all users`;
   }  */
 
-  async findMe(userId: number) {
+  async findOne(query: { [name: string]: number | string }) {
+    return await this.userRepository.findOneByOrFail(query);
+  }
+
+  /* async findMe(userId: number) {
     return await this.userRepository.findOneOrFail({
       where: { id: userId },
     });
@@ -37,7 +41,7 @@ export class UsersService {
         username,
       },
     });
-  }
+  } */
 
   async findMany(query: string) {
     return await this.userRepository.find({

@@ -6,7 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
 } from '@nestjs/common';
+import { Request as RequestExpress } from 'express';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
@@ -18,8 +20,11 @@ export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
   @Post()
-  create(@Body() createOfferDto: CreateOfferDto) {
-    return this.offersService.create(createOfferDto);
+  create(
+    @Body() createOfferDto: CreateOfferDto,
+    @Request() request: RequestExpress,
+  ) {
+    return this.offersService.createOffer(createOfferDto, request);
   }
 
   @Get()
@@ -29,10 +34,10 @@ export class OffersController {
 
   @Get(':id')
   findOne(@Param() params: FindOneOfferDto) {
-    return this.offersService.findOne(params.id);
+    return this.offersService.findOne({ id: params.id });
   }
 
-  @Patch(':id')
+  /*  @Patch(':id')
   update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
     return this.offersService.update(+id, updateOfferDto);
   }
@@ -40,5 +45,5 @@ export class OffersController {
   @Delete(':id')
   remove(@Param() params: DeleteOfferDto) {
     return this.offersService.remove(params.id);
-  }
+  }  */
 }
