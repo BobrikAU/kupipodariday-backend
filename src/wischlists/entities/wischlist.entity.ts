@@ -27,7 +27,10 @@ export class Wishlist {
   @IsNotEmpty()
   name: string;
 
-  @Column('varchar', { length: WISHLIST_DESCRIPTION_LENGTH_MAX })
+  @Column('varchar', {
+    length: WISHLIST_DESCRIPTION_LENGTH_MAX,
+    nullable: true,
+  })
   @Length(WISHLIST_DESCRIPTION_LENGTH_MIN, WISHLIST_DESCRIPTION_LENGTH_MAX)
   description: string;
 

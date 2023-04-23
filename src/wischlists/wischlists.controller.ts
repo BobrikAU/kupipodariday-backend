@@ -6,20 +6,28 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
 } from '@nestjs/common';
+import { Request as RequestExpress } from 'express';
 import { WischlistsService } from './wischlists.service';
 import { CreateWischlistDto } from './dto/create-wischlist.dto';
 import { UpdateWischlistDto } from './dto/update-wischlist.dto';
 import { FindOneWishList } from './dto/find-one-wishlist.dto';
 import { RemoveWishList } from './dto/remove-wishlist.dto';
 
-@Controller('wischlists')
+@Controller('wishlistlists')
 export class WischlistsController {
   constructor(private readonly wischlistsService: WischlistsService) {}
 
   @Post()
-  create(@Body() createWischlistDto: CreateWischlistDto) {
-    return this.wischlistsService.create(createWischlistDto);
+  async create(
+    @Body() createWischlistDto: CreateWischlistDto,
+    @Request() request: RequestExpress,
+  ) {
+    return await this.wischlistsService.createWishlist(
+      createWischlistDto,
+      request,
+    );
   }
 
   @Get()
@@ -29,7 +37,7 @@ export class WischlistsController {
 
   @Get(':id')
   findOne(@Param() params: FindOneWishList) {
-    return this.wischlistsService.findOne(params.id);
+    return this.wischlistsService.findOne({ id: params.id });
   }
 
   @Patch(':id')

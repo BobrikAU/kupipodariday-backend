@@ -1,4 +1,10 @@
-import { IsNotEmpty, Length, IsUrl } from 'class-validator';
+import {
+  IsNotEmpty,
+  Length,
+  IsUrl,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 import {
   WISHLIST_NAME_LENGTH_MIN,
   WISHLIST_NAME_LENGTH_MAX,
@@ -7,15 +13,30 @@ import {
 } from '../../constants';
 
 export class CreateWischlistDto {
-  @IsNotEmpty()
-  @Length(WISHLIST_NAME_LENGTH_MIN, WISHLIST_NAME_LENGTH_MAX)
+  @IsNotEmpty({
+    message: 'Укажите, пожалуйста, название коллекции',
+  })
+  @Length(WISHLIST_NAME_LENGTH_MIN, WISHLIST_NAME_LENGTH_MAX, {
+    message: 'Название коллекции может содержать не более 250 символов.',
+  })
   name: string;
 
-  @IsNotEmpty()
-  @Length(WISHLIST_DESCRIPTION_LENGTH_MIN, WISHLIST_DESCRIPTION_LENGTH_MAX)
+  @IsOptional()
+  @Length(WISHLIST_DESCRIPTION_LENGTH_MIN, WISHLIST_DESCRIPTION_LENGTH_MAX, {
+    message: 'Описание коллекции может содержать до 1500 символов',
+  })
   description: string;
 
-  @IsNotEmpty()
-  @IsUrl()
+  @IsNotEmpty({
+    message:
+      'Укажите, пожалуйста, ссылку на изображение для визуализации коллекции',
+  })
+  @IsUrl({
+    message: 'Укажите валидный URL-адрес изображения',
+  })
   image: string;
+
+  @IsOptional()
+  @IsArray()
+  itemsId: number[];
 }
