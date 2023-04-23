@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Request as RequestExpress, query } from 'express';
+import { Request as RequestExpress } from 'express';
 import { Wishlist } from './entities/wischlist.entity';
 import { CreateWischlistDto } from './dto/create-wischlist.dto';
 import { UpdateWischlistDto } from './dto/update-wischlist.dto';
@@ -27,14 +27,8 @@ export class WischlistsService {
     return await this.wishListRepository.find(options);
   }
 
-  async findOne(query: { [name: string]: string | number }) {
-    return await this.wishListRepository.findOneOrFail({
-      relations: {
-        items: true,
-        owner: true,
-      },
-      where: query,
-    });
+  async findOne(options: any) {
+    return await this.wishListRepository.findOneOrFail(options);
   }
 
   async update(id: number, updateWischlistDto: UpdateWischlistDto) {
@@ -84,6 +78,28 @@ export class WischlistsService {
       relations: {
         items: true,
         owner: true,
+      },
+    });
+  }
+
+  async findeOnWishlist(id: number) {
+    return await this.findOne({
+      select: {
+        owner: {
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+      relations: {
+        items: true,
+        owner: true,
+      },
+      where: {
+        id,
       },
     });
   }

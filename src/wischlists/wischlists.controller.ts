@@ -37,7 +37,7 @@ export class WischlistsController {
 
   @Get(':id')
   findOne(@Param() params: FindOneWishList) {
-    return this.wischlistsService.findOne({ id: params.id });
+    return this.wischlistsService.findeOnWishlist(params.id);
   }
 
   @Patch(':id')
