@@ -32,7 +32,7 @@ export class WischlistsController {
 
   @Get()
   findAll() {
-    return this.wischlistsService.findAll();
+    return this.wischlistsService.findAllWishlists();
   }
 
   @Get(':id')
