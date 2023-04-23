@@ -9,6 +9,23 @@ import { UserHelper } from '../users/helpers/user.helper';
 import { UsersService } from '../users/users.service';
 import { WischesService } from '../wisches/wisches.service';
 
+const optionWischlistInfo = {
+  select: {
+    owner: {
+      id: true,
+      username: true,
+      about: true,
+      avatar: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+  relations: {
+    items: true,
+    owner: true,
+  },
+};
+
 @Injectable()
 export class WischlistsService {
   constructor(
@@ -23,26 +40,34 @@ export class WischlistsService {
     return await this.wishListRepository.save(data);
   }
 
-  async findAll() {
-    return await this.wishListRepository.find();
+  async findAll(options: any) {
+    return await this.wishListRepository.find(options);
   }
 
-  async findOne(query: { [name: string]: string | number }) {
-    return await this.wishListRepository.findOneOrFail({
-      relations: {
-        items: true,
-        owner: true,
-      },
-      where: query,
-    });
+  async findOne(options: any) {
+    return await this.wishListRepository.findOneOrFail(options);
   }
 
-  async update(id: number, updateWischlistDto: UpdateWischlistDto) {
-    return await this.wishListRepository.update(id, updateWischlistDto);
+  async update(id: number, data: { [name: string]: string | object[] }) {
+    return await this.wishListRepository.update(id, data);
   }
 
   async remove(id: number) {
-    return await this.wishListRepository.delete({ id });
+    return await this.wishListRepository.delete(id);
+  }
+
+  async removeWishlist(query: any) {
+    const wishlist = await this.findOne({
+      ...optionWischlistInfo,
+      where: query,
+    });
+    const wishlistInfo = wishlist;
+    if (wishlist.items.length > 0) {
+      wishlist.items = [];
+      await this.wishListRepository.save(wishlist);
+    }
+    await this.remove(wishlist.id);
+    return wishlistInfo;
   }
 
   async createWishlist(
@@ -56,7 +81,7 @@ export class WischlistsService {
       return this.wischesService.findOne({ id: itemId });
     });
     return await Promise.all(itemsList)
-      .then(async (items) => {
+      .then((items) => {
         const wishlistData = {
           ...restCreateWischlistDto,
           owner,
@@ -67,5 +92,41 @@ export class WischlistsService {
       .then((wishlist) => {
         return wishlist;
       });
+  }
+
+  async findAllWishlists() {
+    return await this.findAll(optionWischlistInfo);
+  }
+
+  async findeOnWishlist(id: number) {
+    return await this.findOne({
+      ...optionWischlistInfo,
+      where: {
+        id,
+      },
+    });
+  }
+
+  async updateWishlist(id: number, updateWischlistDto: UpdateWischlistDto) {
+    const { itemsId, ...data } = updateWischlistDto;
+    if (!itemsId) {
+      await this.update(id, data);
+      return await this.findOne({
+        ...optionWischlistInfo,
+        where: { id },
+      });
+    } else {
+      const wischlist = await this.findOne({
+        relations: { items: true, owner: true },
+        where: { id },
+      });
+      wischlist.items = wischlist.items.filter((item) => {
+        return itemsId.includes(item.id);
+      });
+      return this.wishListRepository.save({
+        ...wischlist,
+        ...data,
+      });
+    }
   }
 }

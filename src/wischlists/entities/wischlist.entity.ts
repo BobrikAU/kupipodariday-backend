@@ -4,8 +4,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Column,
-  OneToMany,
+  ManyToMany,
   ManyToOne,
+  JoinTable,
 } from 'typeorm';
 import { Length, IsNotEmpty, IsUrl } from 'class-validator';
 import { Wish } from '../../wisches/entities/wisch.entity';
@@ -39,7 +40,11 @@ export class Wishlist {
   @IsNotEmpty()
   image: string;
 
-  @OneToMany(() => Wish, (wish) => wish.wischlist)
+  // @OneToMany(() => Wish, (wish) => wish.wischlist)
+  // items: Wish[];
+
+  @ManyToMany(() => Wish)
+  @JoinTable()
   items: Wish[];
 
   @ManyToOne(() => User, (user) => user.wishlists)
