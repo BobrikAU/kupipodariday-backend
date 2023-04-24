@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { ServerError } from '../../errors/errors';
-import { BCRYPT_GENSALT_ROUNDS } from '../../constants';
 
 @Injectable()
 export class UserHash {
+  constructor(private configService: ConfigService) {}
+
   public async hashPassword(password: string) {
-    const salt = await bcrypt.genSalt(BCRYPT_GENSALT_ROUNDS);
+    const salt = await bcrypt.genSalt(
+      this.configService.get('bcrypt.gensalt_rounds'),
+    );
     const hash = await bcrypt.hash(password, salt);
     return hash;
   }

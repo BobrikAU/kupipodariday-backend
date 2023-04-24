@@ -24,5 +24,15 @@ export const AppDataSource = new DataSource({
   // logging: true,
   entities: [Offer, User, Wish, Wishlist],
   // subscribers: [],
-  migrations: [changeWishlists21682268049343],
+  migrations: [
+    initMigration1681048409651,
+    changeWish11681048746753,
+    changeWish21681064987122,
+    changeOffer11681233144859,
+    changeUser11681658048773,
+    changeWish31682161462011,
+    changeWishlists11682238765586,
+    changeWishlists21682267419503,
+    changeWishlists21682268049343,
+  ],
 });
