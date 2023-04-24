@@ -20,37 +20,53 @@ export class WischesService {
     private dataSource: DataSource,
   ) {}
 
-  async update(
-    id: number,
-    updateWischData: { [name: string]: number | boolean },
-  ) {
-    return await this.wishRepository.update(id, updateWischData);
+  async create(data: { [name: string]: string | number | object }) {
+    return await this.wishRepository.save(data);
   }
 
-  async create(createWischDto: CreateWischDto, ownerId: number) {
+  async findAll(option = undefined) {
+    return await this.wishRepository.find(option);
+  }
+
+  async findOne(option: object) {
+    return await this.wishRepository.findOneOrFail(option);
+  }
+
+  async update(
+    query: { [name: string]: string | number | object },
+    updateWischData: { [name: string]: number | string } | UpdateWischDto,
+  ) {
+    return await this.wishRepository.update(query, updateWischData);
+  }
+
+  async remove(query: { [name: string]: string | number }) {
+    return await this.wishRepository.delete(query);
+  }
+
+  async createWish(createWischDto: CreateWischDto, ownerId: number) {
     const owner = await this.usersService.findOne({ id: ownerId });
     const data = { ...createWischDto, owner };
-    await this.wishRepository.save(data);
+    await this.create(data);
     return {};
   }
 
   async findAllLast() {
-    return await this.wishRepository.find({
+    return await this.findAll({
       order: { createdAt: 'DESC' },
       take: LENGTH_LIST_LAST_GIFTS,
     });
   }
 
   async findAllTop() {
-    return await this.wishRepository.find({
+    return await this.findAll({
       where: { copied_from: IsNull() },
       order: { copied: 'DESC' },
       take: LENGTH_LIST_POPULAR_GIFTS,
     });
   }
 
-  async findOne(query: { id: number }) {
-    return await this.wishRepository.findOneOrFail({
+  async findOneWish(query: { id: number }) {
+    return await this.findOne({
       select: {
         owner: {
           id: true,
@@ -80,11 +96,11 @@ export class WischesService {
     userId: number,
   ) {
     if (updateWischDto.price) {
-      const result = await this.wishRepository.update(
+      const result = await this.update(
         {
           id: wishId,
           owner: { id: userId },
-          price: updateWischDto.price,
+          raised: 0,
         },
         updateWischDto,
       );
@@ -94,7 +110,7 @@ export class WischesService {
         );
       }
     } else {
-      const result = await this.wishRepository.update(
+      const result = await this.update(
         {
           id: wishId,
           owner: { id: userId },
@@ -110,7 +126,7 @@ export class WischesService {
     return {};
   }
 
-  async remove(wishId: number, userId: number) {
+  async removeWish(wishId: number, userId: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -123,7 +139,7 @@ export class WischesService {
       });
       // проверяем, дедались ли с данного подарка копии; если да, то самая ранняя его копия займет
       // место оригинала и получит данные о количестве созданных копий, что позволит в выдаче сохранить
-      // реальную статистику популярности; если нет, просто удаляем
+      // реальную статистику популярности такого подарка; если нет, просто удаляем
       if (deletedWish.copied > 0) {
         // находим все копии удаляемого подарка, сортируя по дате копирования
         const copiedWishes = await queryRunner.manager.find(Wish, {
@@ -149,11 +165,11 @@ export class WischesService {
             }),
           ]);
         }
-        // удаление подарка
-        await queryRunner.manager.delete(Wish, wishId);
-        await queryRunner.commitTransaction();
-        return deletedWish;
       }
+      // удаление подарка
+      await queryRunner.manager.delete(Wish, wishId);
+      await queryRunner.commitTransaction();
+      return deletedWish;
     } catch {
       await queryRunner.rollbackTransaction();
     } finally {
@@ -165,26 +181,32 @@ export class WischesService {
     // находим id ползователя, который копирует карточку подарка
     const owner = await this.usersService.findOne({ id: userId });
     // находим подарок, на карточке которого пользователь начал процесс копирования
-    const copiedWish = await this.wishRepository.findOneByOrFail(wishId);
+    const copiedWish = await this.findOne({ where: wishId });
     // создаем переменную, где будет id подарка, который является оригинальным
     let originalWishId: number;
     if (!copiedWish.copied_from) {
       // если подарок, на карточке которого начато копирование, сам не является копией, то
       // он принимается за оригинальный и у него увеличивается число копий
       originalWishId = copiedWish.id;
-      await this.wishRepository.update(copiedWish.id, {
-        copied: copiedWish.copied + 1,
-      });
+      await this.update(
+        { id: copiedWish.id },
+        {
+          copied: copiedWish.copied + 1,
+        },
+      );
     } else {
       // есди подарок, на карточке которого начато копирование, является копией, то находим
       // оригинал и увеличиваем у него число копий
       originalWishId = copiedWish.copied_from;
-      const originalWish = await this.wishRepository.findOneByOrFail({
-        id: originalWishId,
+      const originalWish = await this.findOne({
+        where: { id: originalWishId },
       });
-      await this.wishRepository.update(originalWish.id, {
-        copied: originalWish.copied + 1,
-      });
+      await this.update(
+        { id: originalWish.id },
+        {
+          copied: originalWish.copied + 1,
+        },
+      );
     }
     // создаем копию подарка
     const copiedWishData = {
@@ -196,7 +218,7 @@ export class WischesService {
       copied_from: originalWishId,
       owner,
     };
-    await this.wishRepository.save(copiedWishData);
+    await this.create(copiedWishData);
     return {};
   }
 }

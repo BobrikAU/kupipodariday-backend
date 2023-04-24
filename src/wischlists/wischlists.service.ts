@@ -61,7 +61,7 @@ export class WischlistsService {
       ...optionWischlistInfo,
       where: query,
     });
-    const wishlistInfo = wishlist;
+    const wishlistInfo = { ...wishlist };
     if (wishlist.items.length > 0) {
       wishlist.items = [];
       await this.wishListRepository.save(wishlist);

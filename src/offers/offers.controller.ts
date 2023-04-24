@@ -12,8 +12,7 @@ import { Request as RequestExpress } from 'express';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
-import { FindOneOfferDto } from './dto/find-one-offer.dto';
-import { DeleteOfferDto } from './dto/delete-offer.dto';
+import { NumberInParamOfferDto } from './dto/number-in-param-offer.dto';
 
 @Controller('offers')
 export class OffersController {
@@ -33,17 +32,20 @@ export class OffersController {
   }
 
   @Get(':id')
-  findOne(@Param() params: FindOneOfferDto) {
+  findOne(@Param() params: NumberInParamOfferDto) {
     return this.offersService.findOne({ id: params.id });
   }
 
-  /*  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
-    return this.offersService.update(+id, updateOfferDto);
+  @Patch(':id')
+  update(
+    @Param('id') params: NumberInParamOfferDto,
+    @Body() updateOfferDto: UpdateOfferDto,
+  ) {
+    return this.offersService.update({ id: params.id }, updateOfferDto);
   }
 
   @Delete(':id')
-  remove(@Param() params: DeleteOfferDto) {
-    return this.offersService.remove(params.id);
-  }  */
+  remove(@Param() params: NumberInParamOfferDto) {
+    return this.offersService.remove({ id: params.id });
+  }
 }

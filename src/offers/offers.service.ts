@@ -21,55 +21,50 @@ export class OffersService {
     private readonly usersService: UsersService,
   ) {}
 
-  async create(offer: unknown) {
+  private readonly offerInfo = {
+    select: {
+      user: {
+        id: true,
+        username: true,
+        about: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    },
+    relations: {
+      item: true,
+      user: true,
+    },
+  };
+
+  async create(offer: { [name: string]: string | object | number | boolean }) {
     return await this.offerRepository.save(offer);
   }
 
-  async findAll() {
-    return await this.offerRepository.find({
-      select: {
-        user: {
-          id: true,
-          username: true,
-          about: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      },
-      relations: {
-        item: true,
-        user: true,
-      },
-    });
+  async findAll(offerInfo = this.offerInfo) {
+    return await this.offerRepository.find(offerInfo);
   }
 
-  async findOne(query: { [name: string]: number | string }) {
+  async findOne(
+    query: { [name: string]: number | string },
+    offerInfo = this.offerInfo,
+  ) {
     return await this.offerRepository.findOneOrFail({
-      select: {
-        user: {
-          id: true,
-          username: true,
-          about: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      },
-      relations: {
-        item: true,
-        user: true,
-      },
+      ...offerInfo,
       where: query,
     });
   }
 
-  async update(id: number, updateOfferDto: UpdateOfferDto) {
-    return await this.offerRepository.update(id, updateOfferDto);
+  async update(
+    query: { [name: string]: string | number },
+    updateOfferDto: UpdateOfferDto,
+  ) {
+    return await this.offerRepository.update(query, updateOfferDto);
   }
 
-  async remove(id: number) {
-    return await this.offerRepository.delete(id);
+  async remove(query: { [name: string]: string | number }) {
+    return await this.offerRepository.delete(query);
   }
 
   async createOffer(createOfferDto: CreateOfferDto, request: RequestExpress) {
@@ -93,7 +88,7 @@ export class OffersService {
     if (item.price < amountCollected) {
       throw new OfferError(
         `Общая сумма сбора с Вашим взносом превышает цену подарка. Выберите сумму, не превышающую ${
-          Math.floor((item.price - item.raised) * 100) / 100
+          Math.round((item.price - item.raised) * 100) / 100
         } рублей`,
         HTTP_CODE_CONFLICT,
       );
@@ -106,7 +101,10 @@ export class OffersService {
       user,
     };
     await this.create(offer);
-    await this.wischesService.update(item.id, { raised: amountCollected });
+    await this.wischesService.update(
+      { id: item.id },
+      { raised: amountCollected },
+    );
     return {};
   }
 }

@@ -1,6 +1,6 @@
 import { IsNumberString } from 'class-validator';
 
-export class FindOneOfferDto {
+export class NumberInParamOfferDto {
   @IsNumberString()
   id: number;
 }

@@ -39,7 +39,7 @@ export class WischesController {
     @Request() request: RequestExpress,
   ) {
     const ownerId = this.userHelper.getUserIdOutRequest(request);
-    return this.wischesService.create(createWischDto, ownerId);
+    return this.wischesService.createWish(createWischDto, ownerId);
   }
 
   @Get('last')
@@ -55,7 +55,7 @@ export class WischesController {
   @UseInterceptors(FindOneResponseInterceptor)
   @Get(':id')
   findOne(@Param() params: IdWishDto) {
-    return this.wischesService.findOne({ id: params.id });
+    return this.wischesService.findOneWish({ id: params.id });
   }
 
   @UseFilters(UpdateWishErrorFilter)
@@ -77,12 +77,12 @@ export class WischesController {
   @Delete(':id')
   remove(@Param() params: DeleteWishDto, @Request() request: RequestExpress) {
     const userId = this.userHelper.getUserIdOutRequest(request);
-    return this.wischesService.remove(params.id, userId);
+    return this.wischesService.removeWish(params.id, userId);
   }
 
   @Post(':id/copy')
   async copy(@Param() param: CopyWishDto, @Request() request: RequestExpress) {
     const userId = this.userHelper.getUserIdOutRequest(request);
-    return await this.wischesService.copy({ id: param.id }, userId);
+    return await this.wischesService.copy({ id: +param.id }, userId);
   }
 }

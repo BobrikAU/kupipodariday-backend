@@ -14,6 +14,24 @@ export class UsersService {
     private readonly userHasch: UserHash,
   ) {}
 
+  private readonly userInfoWithoutPasswordEmail = {
+    select: {
+      id: true,
+      username: true,
+      about: true,
+      avatar: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  };
+
+  private readonly userInfoWithoutPassword = {
+    select: {
+      ...this.userInfoWithoutPasswordEmail.select,
+      email: true,
+    },
+  };
+
   async create(createUserDto: CreateUserDto) {
     createUserDto.password = await this.userHasch.hashPassword(
       createUserDto.password,
@@ -21,39 +39,34 @@ export class UsersService {
     return await this.userRepository.save(createUserDto);
   }
 
-  /*  findAll() {
-    return `This action returns all users`;
-  }  */
-
-  async findOne(query: { [name: string]: number | string }) {
-    return await this.userRepository.findOneByOrFail(query);
+  async findAll() {
+    return await this.userRepository.find();
   }
 
-  /* async findMe(userId: number) {
+  async findOne(
+    query: { [name: string]: number | string },
+    userInfo = undefined,
+  ) {
     return await this.userRepository.findOneOrFail({
-      where: { id: userId },
+      ...userInfo,
+      where: query,
     });
   }
 
-  async findOne(username: string) {
-    return await this.userRepository.findOneOrFail({
-      where: {
-        username,
-      },
-    });
-  } */
+  async update(
+    query: { [name: string]: string | number },
+    updateOfferDto: UpdateUserDto,
+  ) {
+    return await this.userRepository.update(query, updateOfferDto);
+  }
+
+  remove(query: { [name: string]: string | number }) {
+    return this.userRepository.delete(query);
+  }
 
   async findMany(query: string) {
     return await this.userRepository.find({
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        about: true,
-        avatar: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      ...this.userInfoWithoutPasswordEmail,
       where: [{ username: query }, { email: query }],
     });
   }
@@ -64,50 +77,35 @@ export class UsersService {
         updateUserDto.password,
       );
     }
-    await this.userRepository.update({ id: userId }, updateUserDto);
-    return await this.userRepository.findOneOrFail({
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        about: true,
-        avatar: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      where: {
-        id: userId,
-      },
-    });
-  }
-
-  remove(username: string) {
-    return this.userRepository.delete({ username });
+    await this.update({ id: userId }, updateUserDto);
+    return await this.findOne({ id: userId }, this.userInfoWithoutPassword);
   }
 
   async findMyWishes(userId: number) {
-    return await this.userRepository.findOneOrFail({
-      select: {
-        wishes: true, // выбрано не все, что нужно по свагеру, но в коде не увидел, куда нужна вся эта информация
+    return await this.findOne(
+      { id: userId },
+      {
+        select: {
+          wishes: true, // выбрано не все, что нужно по свагеру, но в коде не увидел, куда нужна вся эта информация
+        },
+        relations: {
+          wishes: true,
+        },
       },
-      relations: {
-        wishes: true,
-      },
-      where: {
-        id: userId,
-      },
-    });
+    );
   }
 
   async findAnotherUserWishes(username: string) {
-    return await this.userRepository.findOneOrFail({
-      select: {
-        wishes: true, // выбрано не все, так как по коду нужна только информация о самом подарке
+    return await this.findOne(
+      { username },
+      {
+        select: {
+          wishes: true, // выбрано не все, так как по коду нужна только информация о самом подарке
+        },
+        relations: {
+          wishes: true,
+        },
       },
-      relations: {
-        wishes: true,
-      },
-      where: { username },
-    });
+    );
   }
 }
