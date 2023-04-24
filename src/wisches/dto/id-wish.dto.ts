@@ -1,6 +1,6 @@
 import { IsNumberString } from 'class-validator';
 
-export class IdWishDto {
+export class IdWishInParamsDto {
   @IsNumberString()
   public id: number;
 }

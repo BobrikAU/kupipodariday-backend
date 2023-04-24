@@ -1,6 +1,6 @@
 import { IsNumberString } from 'class-validator';
 
-export class FindOneWishList {
+export class IdInParamsWishList {
   @IsNumberString()
   id: number;
 }

@@ -13,9 +13,7 @@ import {
 import { WischesService } from './wisches.service';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
-import { IdWishDto } from './dto/id-wish.dto';
-import { DeleteWishDto } from './dto/delete-wish.dto';
-import { CopyWishDto } from './dto/copy-wish.dto';
+import { IdWishInParamsDto } from './dto/id-wish.dto';
 import { UserHelper } from '../users/helpers/user.helper';
 import { Request as RequestExpress } from 'express';
 import { InvalidData } from '../filters/user-exists.filter';
@@ -54,14 +52,14 @@ export class WischesController {
 
   @UseInterceptors(FindOneResponseInterceptor)
   @Get(':id')
-  findOne(@Param() params: IdWishDto) {
+  findOne(@Param() params: IdWishInParamsDto) {
     return this.wischesService.findOneWish({ id: params.id });
   }
 
   @UseFilters(UpdateWishErrorFilter)
   @Patch(':id')
   update(
-    @Param() params: IdWishDto,
+    @Param() params: IdWishInParamsDto,
     @Body() updateWischDto: UpdateWischDto,
     @Request() request: RequestExpress,
   ) {
@@ -75,13 +73,19 @@ export class WischesController {
 
   @UseFilters(EntityNotFoundErrorFilter)
   @Delete(':id')
-  remove(@Param() params: DeleteWishDto, @Request() request: RequestExpress) {
+  remove(
+    @Param() params: IdWishInParamsDto,
+    @Request() request: RequestExpress,
+  ) {
     const userId = this.userHelper.getUserIdOutRequest(request);
     return this.wischesService.removeWish(params.id, userId);
   }
 
   @Post(':id/copy')
-  async copy(@Param() param: CopyWishDto, @Request() request: RequestExpress) {
+  async copy(
+    @Param() param: IdWishInParamsDto,
+    @Request() request: RequestExpress,
+  ) {
     const userId = this.userHelper.getUserIdOutRequest(request);
     return await this.wischesService.copy({ id: +param.id }, userId);
   }

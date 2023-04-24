@@ -69,7 +69,9 @@ export class OffersService {
 
   async createOffer(createOfferDto: CreateOfferDto, request: RequestExpress) {
     const item = await this.wischesService.findOne({
-      id: createOfferDto.itemId,
+      select: { owner: { id: true } },
+      relations: { owner: true },
+      where: { id: createOfferDto.itemId },
     });
     const userId = this.userHelper.getUserIdOutRequest(request);
     if (userId === item.owner.id) {

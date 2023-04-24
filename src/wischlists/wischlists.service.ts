@@ -78,7 +78,7 @@ export class WischlistsService {
     const owner = await this.usersService.findOne({ id: ownerId });
     const { itemsId, ...restCreateWischlistDto } = createWischlistDto;
     const itemsList = itemsId.map((itemId) => {
-      return this.wischesService.findOne({ id: itemId });
+      return this.wischesService.findOne({ where: { id: itemId } });
     });
     return await Promise.all(itemsList)
       .then((items) => {
