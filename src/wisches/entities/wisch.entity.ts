@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
-import { Wishlist } from '../../wischlists/entities/wischlist.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import {
   WISH_NAME_LENGTH_MIN,
@@ -66,9 +65,6 @@ export class Wish {
 
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
-
-  // @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
-  // wischlist: Wishlist;
 
   @Column('integer', { default: 0 })
   copied: number;

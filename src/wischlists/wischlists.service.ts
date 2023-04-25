@@ -61,7 +61,7 @@ export class WischlistsService {
       ...optionWischlistInfo,
       where: query,
     });
-    const wishlistInfo = wishlist;
+    const wishlistInfo = { ...wishlist };
     if (wishlist.items.length > 0) {
       wishlist.items = [];
       await this.wishListRepository.save(wishlist);
@@ -78,7 +78,7 @@ export class WischlistsService {
     const owner = await this.usersService.findOne({ id: ownerId });
     const { itemsId, ...restCreateWischlistDto } = createWischlistDto;
     const itemsList = itemsId.map((itemId) => {
-      return this.wischesService.findOne({ id: itemId });
+      return this.wischesService.findOne({ where: { id: itemId } });
     });
     return await Promise.all(itemsList)
       .then((items) => {

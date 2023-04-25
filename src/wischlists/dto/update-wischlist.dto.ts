@@ -1,5 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateWischlistDto } from './create-wischlist.dto';
 import { IsOptional, Length, IsUrl, IsArray } from 'class-validator';
 import {
   WISHLIST_NAME_LENGTH_MIN,
@@ -31,5 +29,3 @@ export class UpdateWischlistDto {
   @IsArray()
   itemsId: number[];
 }
-
-// export class UpdateWischlistDto extends PartialType(CreateWischlistDto) {}

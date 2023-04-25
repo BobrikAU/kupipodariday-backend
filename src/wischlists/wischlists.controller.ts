@@ -13,8 +13,7 @@ import { Request as RequestExpress } from 'express';
 import { WischlistsService } from './wischlists.service';
 import { CreateWischlistDto } from './dto/create-wischlist.dto';
 import { UpdateWischlistDto } from './dto/update-wischlist.dto';
-import { FindOneWishList } from './dto/find-one-wishlist.dto';
-import { RemoveWishList } from './dto/remove-wishlist.dto';
+import { IdInParamsWishList } from './dto/id-in-params-wishlist.dto';
 import { RestrictionUserInfoWishlistInterceptor } from './interceptors/restriction-user-info-wishlist.interceptor';
 
 @Controller('wishlistlists')
@@ -39,7 +38,7 @@ export class WischlistsController {
   }
 
   @Get(':id')
-  findOne(@Param() params: FindOneWishList) {
+  findOne(@Param() params: IdInParamsWishList) {
     return this.wischlistsService.findeOnWishlist(params.id);
   }
 
@@ -54,7 +53,7 @@ export class WischlistsController {
 
   @UseInterceptors(RestrictionUserInfoWishlistInterceptor)
   @Delete(':id')
-  remove(@Param() params: RemoveWishList) {
+  remove(@Param() params: IdInParamsWishList) {
     return this.wischlistsService.removeWishlist({ id: params.id });
   }
 }

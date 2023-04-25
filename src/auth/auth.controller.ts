@@ -3,15 +3,14 @@ import {
   Post,
   Body,
   UseInterceptors,
-  Header,
   UseFilters,
   UseGuards,
   Request,
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { AuthUserDto } from './dto/authUser.dto';
 import { AuthService } from './auth.service';
 import { SignupAuthResponseInterceptor } from './interceptors/signup-auth-response.interceptor';
+import { SignupAuthRequestInterceptor } from './interceptors/signup-auth-request.interceptor';
 import {
   UserOrMailExistsExceptionFilter,
   InvalidData,
@@ -27,7 +26,7 @@ export class AuthController {
   @Public()
   @Post('signup')
   @UseFilters(UserOrMailExistsExceptionFilter, InvalidData)
-  @UseInterceptors(SignupAuthResponseInterceptor)
+  @UseInterceptors(SignupAuthResponseInterceptor, SignupAuthRequestInterceptor)
   async signup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.signup(createUserDto);
   }

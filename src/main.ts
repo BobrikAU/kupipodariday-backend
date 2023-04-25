@@ -1,18 +1,24 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { APP_SERVER_PORT, APP_SERVER_HOSTNAME } from './constants';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
   });
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       whitelist: true,
     }),
   );
-  await app.listen(APP_SERVER_PORT, APP_SERVER_HOSTNAME);
+  const configService = app.get(ConfigService);
+  await app.listen(
+    configService.get('appServer.port'),
+    configService.get('appServer.host'),
+  );
 }
 bootstrap();

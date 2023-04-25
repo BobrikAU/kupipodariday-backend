@@ -7,13 +7,11 @@ import {
   Param,
   Delete,
   Request,
-  UseGuards,
   UseFilters,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FindOneUser } from './dto/find-one-user.dto';
 import { FindManyDto } from './dto/find-many.dto';
 import { Request as RequestExpress } from 'express';
 import { UserHelper } from './helpers/user.helper';
@@ -31,10 +29,10 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  /*  @Get()
+  @Get()
   findAll() {
     return this.usersService.findAll();
-  }  */
+  }
 
   @Get('me')
   async findMe(@Request() request: RequestExpress) {
@@ -84,6 +82,6 @@ export class UsersController {
 
   @Delete(':username')
   remove(@Param('username') username: string) {
-    return this.usersService.remove(username);
+    return this.usersService.remove({ username });
   }
 }

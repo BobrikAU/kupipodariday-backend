@@ -1,5 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
 import {
   USERNAME_LENGTH_MIN,
   USERNAME_LENGTH_MAX,
@@ -11,7 +9,7 @@ import {
 import { Length, IsUrl, IsEmail, MinLength, IsOptional } from 'class-validator';
 
 export class UpdateUserDto {
-  @IsOptional({ message: 'Поле Юзерннейм обязательно' })
+  @IsOptional()
   @Length(USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX, {
     message: 'Имя пользователя должно быть не менее 3 и не более 64 символов',
   })
@@ -42,5 +40,3 @@ export class UpdateUserDto {
   })
   password: string;
 }
-
-// export class UpdateUserDto extends PartialType(CreateUserDto) {}
