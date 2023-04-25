@@ -1,8 +1,8 @@
 {
   "name": "kupipodariday-backend",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Backend of service KupiPodariDay",
+  "author": "Bobrik Aleksandr",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

@@ -1,6 +1,3 @@
-// export const APP_SERVER_PORT = 3001;
-// export const APP_SERVER_HOSTNAME = 'localhost';
-
 export const USERNAME_LENGTH_MIN = 3;
 export const USERNAME_LENGTH_MAX = 64;
 export const PASSWORD_LENGTH_MIN = 3;

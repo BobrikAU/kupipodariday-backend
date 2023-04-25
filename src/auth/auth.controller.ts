@@ -3,14 +3,11 @@ import {
   Post,
   Body,
   UseInterceptors,
-  Header,
   UseFilters,
   UseGuards,
   Request,
-  Inject,
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { AuthUserDto } from './dto/authUser.dto';
 import { AuthService } from './auth.service';
 import { SignupAuthResponseInterceptor } from './interceptors/signup-auth-response.interceptor';
 import { SignupAuthRequestInterceptor } from './interceptors/signup-auth-request.interceptor';
@@ -21,9 +18,6 @@ import {
 } from '../filters/user-exists.filter';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './guards/jwt-auth.guard';
-
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { Logger } from 'winston';
 
 @Controller()
 export class AuthController {

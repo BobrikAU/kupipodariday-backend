@@ -2,7 +2,6 @@ import {
   Catch,
   ExceptionFilter,
   ArgumentsHost,
-  HttpException,
   BadRequestException,
   UnauthorizedException,
   ForbiddenException,

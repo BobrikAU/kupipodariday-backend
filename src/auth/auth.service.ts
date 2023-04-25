@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
-import { AuthUserDto } from './dto/authUser.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ServerError } from '../errors/errors';
 import { UserHash } from 'src/users/helpers/hash.helper';

@@ -83,10 +83,6 @@ import { changeWishlists21682268049343 } from './database/migrations/16822680493
           maxSize: '20m',
           maxFiles: '14d',
         }),
-        /*new winston.transports.File({
-          filename: 'logs/another.log',
-          level: 'another_log_level',
-        }),*/
       ],
     }),
     UsersModule,

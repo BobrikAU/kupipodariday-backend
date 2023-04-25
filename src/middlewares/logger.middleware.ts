@@ -14,8 +14,8 @@ export class AppHTTPLogger implements NestMiddleware {
       const { statusCode, statusMessage } = res;
       this.logger.info(
         `${new Date().toISOString()}. Request: ${method} ${originalUrl}. Response: ${statusCode} ${
-          !!statusMessage && statusMessage
-        }.${statusCode >= 400 && ' Body of request: '}`,
+          statusMessage ? statusMessage : ''
+        }.${statusCode >= 400 ? ' Body of request: ' : ''}`,
       );
       if (statusCode >= 400) {
         this.logger.info(req.body);

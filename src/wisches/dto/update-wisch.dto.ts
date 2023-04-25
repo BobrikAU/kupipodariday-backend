@@ -1,5 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateWischDto } from './create-wisch.dto';
 import { IsNotEmpty, Length, IsUrl, IsOptional } from 'class-validator';
 import {
   WISH_NAME_LENGTH_MIN,
@@ -41,5 +39,3 @@ export class UpdateWischDto {
   })
   description: string;
 }
-
-// export class UpdateWischDto extends PartialType(CreateWischDto) {}

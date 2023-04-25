@@ -40,9 +40,6 @@ export class Wishlist {
   @IsNotEmpty()
   image: string;
 
-  // @OneToMany(() => Wish, (wish) => wish.wischlist)
-  // items: Wish[];
-
   @ManyToMany(() => Wish)
   @JoinTable()
   items: Wish[];

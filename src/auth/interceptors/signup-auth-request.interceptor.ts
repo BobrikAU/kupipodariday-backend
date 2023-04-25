@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
-import { CreateUserDto } from '../../users/dto/create-user.dto';
 
 @Injectable()
 export class SignupAuthRequestInterceptor implements NestInterceptor {
