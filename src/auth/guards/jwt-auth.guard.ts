@@ -37,6 +37,9 @@ export class JwtAuthGuard implements CanActivate {
     // получаем username и id пользователя и добавляем эту информацию к объекту запроса
     const request = context.switchToHttp().getRequest<Request>();
     const { authorization: authorizationHeader } = request.headers;
+    if (!authorizationHeader || !authorizationHeader.includes('Bearer ')) {
+      return false;
+    }
     const token = authorizationHeader.split(' ')[1];
     const user = this.jwtService.decode(token);
     if (user) {

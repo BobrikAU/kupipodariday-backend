@@ -7,6 +7,7 @@ import {
   UseFilters,
   UseGuards,
   Request,
+  Inject,
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthUserDto } from './dto/authUser.dto';
@@ -20,6 +21,9 @@ import {
 } from '../filters/user-exists.filter';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './guards/jwt-auth.guard';
+
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Controller()
 export class AuthController {

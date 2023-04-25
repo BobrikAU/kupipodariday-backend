@@ -1,6 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 import { UsersModule } from './users/users.module';
 import { WischesModule } from './wisches/wisches.module';
 import { WischlistsModule } from './wischlists/wischlists.module';
@@ -10,8 +13,9 @@ import { User } from './users/entities/user.entity';
 import { Wish } from './wisches/entities/wisch.entity';
 import { Wishlist } from './wischlists/entities/wischlist.entity';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from '../config';
+import { AppHTTPLogger } from './middlewares/logger.middleware';
+import 'winston-daily-rotate-file';
 import { initMigration1681048409651 } from './database/migrations/1681048409651-initMigration';
 import { changeWish11681048746753 } from './database/migrations/1681048746753-changeWish1';
 import { changeWish21681064987122 } from './database/migrations/1681064987122-changeWish2';
@@ -52,6 +56,39 @@ import { changeWishlists21682268049343 } from './database/migrations/16822680493
         ],
       }),
     }),
+    WinstonModule.forRoot({
+      levels: {
+        critical_error: 0,
+        error: 1,
+        special_warning: 2,
+        another_log_level: 3,
+        info: 4,
+      },
+      transports: [
+        new winston.transports.DailyRotateFile({
+          level: 'error',
+          dirname: 'logs',
+          filename: 'error-%DATE%.log',
+          datePattern: 'YYYY-MM-DD-HH',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+        }),
+        new winston.transports.DailyRotateFile({
+          level: 'info',
+          dirname: 'logs',
+          filename: 'info-%DATE%.log',
+          datePattern: 'YYYY-MM-DD-HH',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+        }),
+        /*new winston.transports.File({
+          filename: 'logs/another.log',
+          level: 'another_log_level',
+        }),*/
+      ],
+    }),
     UsersModule,
     WischesModule,
     WischlistsModule,
@@ -61,4 +98,8 @@ import { changeWishlists21682268049343 } from './database/migrations/16822680493
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AppHTTPLogger).forRoutes('/');
+  }
+}
