@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request as RequestExpress } from 'express';
 import { Offer } from './entities/offer.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { WischesService } from '../wisches/wisches.service';
@@ -10,6 +10,7 @@ import { UserHelper } from '../users/helpers/user.helper';
 import { UsersService } from '../users/users.service';
 import { OfferError } from '../errors/errors';
 import { HTTP_CODE_CONFLICT } from '../constants';
+import { Wish } from 'src/wisches/entities/wisch.entity';
 
 @Injectable()
 export class OffersService {
@@ -19,6 +20,7 @@ export class OffersService {
     public readonly wischesService: WischesService,
     private readonly userHelper: UserHelper,
     private readonly usersService: UsersService,
+    private readonly dataSource: DataSource,
   ) {}
 
   private readonly offerInfo = {
@@ -95,6 +97,7 @@ export class OffersService {
         HTTP_CODE_CONFLICT,
       );
     }
+
     const user = await this.usersService.findOne({ id: userId });
     const offer = {
       amount: createOfferDto.amount,
@@ -102,11 +105,23 @@ export class OffersService {
       item,
       user,
     };
-    await this.create(offer);
-    await this.wischesService.update(
-      { id: item.id },
-      { raised: amountCollected },
-    );
-    return {};
+    // создание offer с помощью транзакции
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.save(Offer, offer);
+      await queryRunner.manager.update(
+        Wish,
+        { id: item.id },
+        { raised: amountCollected },
+      );
+      await queryRunner.commitTransaction();
+      return {};
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

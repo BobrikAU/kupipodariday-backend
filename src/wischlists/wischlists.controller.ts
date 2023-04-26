@@ -46,14 +46,22 @@ export class WischlistsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
+    @Request() request: RequestExpress,
     @Body() updateWischlistDto: UpdateWischlistDto,
   ) {
-    return this.wischlistsService.updateWishlist(+id, updateWischlistDto);
+    return this.wischlistsService.updateWishlist(
+      +id,
+      updateWischlistDto,
+      request,
+    );
   }
 
   @UseInterceptors(RestrictionUserInfoWishlistInterceptor)
   @Delete(':id')
-  remove(@Param() params: IdInParamsWishList) {
-    return this.wischlistsService.removeWishlist({ id: params.id });
+  remove(
+    @Param() params: IdInParamsWishList,
+    @Request() request: RequestExpress,
+  ) {
+    return this.wischlistsService.removeWishlist({ id: params.id }, request);
   }
 }

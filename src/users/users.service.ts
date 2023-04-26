@@ -31,7 +31,7 @@ export class UsersService {
       email: true,
     },
   };
-
+  // добавлен фильтр исключений в контроллере по роуту  post 'users'
   async create(createUserDto: CreateUserDto) {
     createUserDto.password = await this.userHasch.hashPassword(
       createUserDto.password,
@@ -52,7 +52,7 @@ export class UsersService {
       where: query,
     });
   }
-
+  // добавлен фильтр исключений в контроллере по роуту  patch 'users/me'
   async update(
     query: { [name: string]: string | number },
     updateOfferDto: UpdateUserDto,
