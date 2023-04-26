@@ -15,7 +15,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindManyDto } from './dto/find-many.dto';
 import { Request as RequestExpress } from 'express';
 import { UserHelper } from './helpers/user.helper';
-import { InvalidData } from '../filters/user-exists.filter';
+import {
+  InvalidData,
+  UserOrMailExistsExceptionFilter,
+} from '../filters/user-exists.filter';
 
 @Controller('users')
 export class UsersController {
@@ -24,6 +27,7 @@ export class UsersController {
     private readonly userHelper: UserHelper,
   ) {}
 
+  @UseFilters(UserOrMailExistsExceptionFilter)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -44,7 +48,7 @@ export class UsersController {
     return userWithoutPassword;
   }
 
-  @UseFilters(InvalidData)
+  @UseFilters(InvalidData, UserOrMailExistsExceptionFilter)
   @Patch('me')
   update(
     @Body() updateUserDto: UpdateUserDto,

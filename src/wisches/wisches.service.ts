@@ -5,7 +5,7 @@ import { Wish } from './entities/wisch.entity';
 import { CreateWischDto } from './dto/create-wisch.dto';
 import { UpdateWischDto } from './dto/update-wisch.dto';
 import { UsersService } from 'src/users/users.service';
-import { ForbiddenActionError } from '../errors/errors';
+import { ForbiddenActionError, ReCopyingWish } from '../errors/errors';
 import {
   LENGTH_LIST_LAST_GIFTS,
   LENGTH_LIST_POPULAR_GIFTS,
@@ -218,7 +218,20 @@ export class WischesService {
       copied_from: originalWishId,
       owner,
     };
-    await this.create(copiedWishData);
-    return {};
+    const similarUserWish = this.wishRepository.findOne({
+      relations: {
+        owner: true,
+      },
+      where: [
+        { copied_from: originalWishId, owner: { id: userId } },
+        { id: originalWishId, owner: { id: userId } },
+      ],
+    });
+    if (!similarUserWish) {
+      await this.create(copiedWishData);
+      return {};
+    } else {
+      throw new ReCopyingWish();
+    }
   }
 }

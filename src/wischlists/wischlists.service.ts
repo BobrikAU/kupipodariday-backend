@@ -8,6 +8,8 @@ import { UpdateWischlistDto } from './dto/update-wischlist.dto';
 import { UserHelper } from '../users/helpers/user.helper';
 import { UsersService } from '../users/users.service';
 import { WischesService } from '../wisches/wisches.service';
+import { WishlistsError } from '../errors/errors';
+import { HTTP_CODE_FORBIDDEN } from '../constants';
 
 const optionWischlistInfo = {
   select: {
@@ -56,11 +58,18 @@ export class WischlistsService {
     return await this.wishListRepository.delete(id);
   }
 
-  async removeWishlist(query: any) {
+  async removeWishlist(query: any, request: RequestExpress) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
     const wishlist = await this.findOne({
       ...optionWischlistInfo,
       where: query,
     });
+    if (wishlist.owner.id !== userId) {
+      throw new WishlistsError(
+        'Удалить список желаний может только его владелец. Вы паетесь удалить чужой список.',
+        HTTP_CODE_FORBIDDEN,
+      );
+    }
     const wishlistInfo = { ...wishlist };
     if (wishlist.items.length > 0) {
       wishlist.items = [];
@@ -107,7 +116,22 @@ export class WischlistsService {
     });
   }
 
-  async updateWishlist(id: number, updateWischlistDto: UpdateWischlistDto) {
+  async updateWishlist(
+    id: number,
+    updateWischlistDto: UpdateWischlistDto,
+    request: RequestExpress,
+  ) {
+    const userId = this.userHelper.getUserIdOutRequest(request);
+    const wischlist = await this.findOne({
+      relations: { items: true, owner: true },
+      where: { id },
+    });
+    if (wischlist.owner.id !== userId) {
+      throw new WishlistsError(
+        'Редактировать список желаний может только его владелец. Вы паетесь редактировать чужой список.',
+        HTTP_CODE_FORBIDDEN,
+      );
+    }
     const { itemsId, ...data } = updateWischlistDto;
     if (!itemsId) {
       await this.update(id, data);
@@ -116,10 +140,6 @@ export class WischlistsService {
         where: { id },
       });
     } else {
-      const wischlist = await this.findOne({
-        relations: { items: true, owner: true },
-        where: { id },
-      });
       wischlist.items = wischlist.items.filter((item) => {
         return itemsId.includes(item.id);
       });
